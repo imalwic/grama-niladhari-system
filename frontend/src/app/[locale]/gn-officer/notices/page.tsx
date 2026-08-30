@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,51 +23,85 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Bell, Trash2 } from "lucide-react";
+import { Plus, Bell, Trash2, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-// MOCK DATA
-const MOCK_NOTICES = [
-  {
-    id: "1",
-    title: "Dengue Eradication Program",
-    content: "Please keep your premises clean. Health inspectors will visit tomorrow morning.",
-    type: "ALERT",
-    createdAt: "2023-10-25T10:00:00Z",
-    expiresAt: "2023-10-27T10:00:00Z",
-  },
-  {
-    id: "2",
-    title: "Aswesuma Registration",
-    content: "Submit your appeals before Friday at the GN office.",
-    type: "GENERAL",
-    createdAt: "2023-10-23T14:30:00Z",
-    expiresAt: "2023-10-30T17:00:00Z",
-  },
-];
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+}
 
 export default function GnOfficerNotices() {
-  const [notices, setNotices] = useState(MOCK_NOTICES);
+  const [notices, setNotices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const t = useTranslations("GnOfficer");
 
-  const handleCreateNotice = (e: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    fetchNotices();
+  }, []);
+
+  const fetchNotices = async () => {
+    try {
+      const res = await fetch("http://localhost:3001/notices/gn-officer", {
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNotices(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch notices:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateNotice = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitting(true);
     const formData = new FormData(e.currentTarget);
-    const newNotice = {
-      id: Math.random().toString(),
+    const payload = {
       title: formData.get("title") as string,
       content: formData.get("content") as string,
       type: formData.get("type") as string,
-      createdAt: new Date().toISOString(),
-      expiresAt: (formData.get("expiresAt") as string) || "",
+      expiresAt: (formData.get("expiresAt") as string) || null,
     };
-    setNotices([newNotice, ...notices]);
-    setIsDialogOpen(false);
+
+    try {
+      const res = await fetch("http://localhost:3001/notices", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        setIsDialogOpen(false);
+        fetchNotices();
+      }
+    } catch (error) {
+      console.error("Failed to create notice:", error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setNotices(notices.filter((n) => n.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this notice?")) return;
+    try {
+      const res = await fetch(`http://localhost:3001/notices/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        fetchNotices();
+      }
+    } catch (error) {
+      console.error("Failed to delete notice:", error);
+    }
   };
 
   const getTypeBadge = (type: string) => {
@@ -130,39 +164,48 @@ export default function GnOfficerNotices() {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit" className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">{t("publish")}</Button>
+                <Button type="submit" disabled={submitting} className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
+                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {t("publish")}
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {notices.map((notice) => (
-          <Card key={notice.id} className="flex flex-col dark:bg-slate-900 dark:border-slate-800">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                {getTypeBadge(notice.type)}
-                <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950" onClick={() => handleDelete(notice.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-              <CardTitle className="mt-2 text-lg">{notice.title}</CardTitle>
-              <CardDescription>
-                {t("published")}: {new Date(notice.createdAt).toLocaleDateString()}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-              {notice.content}
-            </CardContent>
-            {notice.expiresAt && (
-              <div className="px-6 pb-4 text-xs text-slate-500 dark:text-slate-400 flex items-center">
-                <Bell className="h-3 w-3 mr-1" /> {t("validUntil")}: {new Date(notice.expiresAt).toLocaleDateString()}
-              </div>
-            )}
-          </Card>
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+      ) : notices.length === 0 ? (
+        <div className="text-center p-8 text-muted-foreground border rounded-lg border-dashed">No notices published yet.</div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {notices.map((notice) => (
+            <Card key={notice.id} className="flex flex-col dark:bg-slate-900 dark:border-slate-800">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  {getTypeBadge(notice.type)}
+                  <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950" onClick={() => handleDelete(notice.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CardTitle className="mt-2 text-lg">{notice.title}</CardTitle>
+                <CardDescription>
+                  {t("published")}: {new Date(notice.createdAt).toLocaleDateString()}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                {notice.content}
+              </CardContent>
+              {notice.expiresAt && (
+                <div className="px-6 pb-4 text-xs text-slate-500 dark:text-slate-400 flex items-center">
+                  <Bell className="h-3 w-3 mr-1" /> {t("validUntil")}: {new Date(notice.expiresAt).toLocaleDateString()}
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
