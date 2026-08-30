@@ -1,28 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Plus, Edit, Trash2, UploadCloud } from "lucide-react";
+import { Search, Plus, Edit, Trash2, UploadCloud, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-const MOCK_HOUSEHOLDS = [
-  { id: 1, householdNo: "H-001", address: "No 12, Main Street, Weeraketiya", membersCount: 4 },
-  { id: 2, householdNo: "H-002", address: "No 45, Temple Road, Weeraketiya", membersCount: 2 },
-  { id: 3, householdNo: "H-003", address: "No 8, School Lane, Weeraketiya", membersCount: 5 },
-];
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+}
 
 export default function HouseholdsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [households, setHouseholds] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedHousehold, setSelectedHousehold] = useState<any>(null);
   const t = useTranslations("GnOfficer");
   const c = useTranslations("Common");
 
-  const filteredHouseholds = MOCK_HOUSEHOLDS.filter((h) =>
-    h.householdNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    h.address.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    fetchHouseholds();
+  }, []);
+
+  const fetchHouseholds = async () => {
+    try {
+      const res = await fetch("http://localhost:3001/households", {
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHouseholds(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch households:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateHousehold = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitting(true);
+    const formData = new FormData(e.currentTarget);
+    const payload = {
+      houseNumber: formData.get("houseNo") as string,
+      address: formData.get("address") as string,
+    };
+
+    try {
+      const res = await fetch("http://localhost:3001/households", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        setIsDialogOpen(false);
+        fetchHouseholds();
+      }
+    } catch (error) {
+      console.error("Failed to create household:", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const filteredHouseholds = households.filter((h) =>
+    (h.houseNumber || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (h.address || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -60,30 +113,35 @@ export default function HouseholdsManagement() {
             </DialogContent>
           </Dialog>
 
-          <Dialog>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger render={
               <Button className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
                 <Plus className="mr-2 h-4 w-4" /> {t("addHousehold")}
               </Button>
             } />
             <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{t("registerNewHousehold")}</DialogTitle>
-                <DialogDescription>{t("createNewHousehold")}</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="houseNo" className="text-right">{t("householdNo")}</Label>
-                  <Input id="houseNo" className="col-span-3" placeholder={t("householdNo")} />
+              <form onSubmit={handleCreateHousehold}>
+                <DialogHeader>
+                  <DialogTitle>{t("registerNewHousehold")}</DialogTitle>
+                  <DialogDescription>{t("createNewHousehold")}</DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="houseNo" className="text-right">{t("householdNo")}</Label>
+                    <Input id="houseNo" name="houseNo" required className="col-span-3" placeholder={t("householdNo")} />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="address" className="text-right">{t("address")}</Label>
+                    <Input id="address" name="address" required className="col-span-3" placeholder={t("address")} />
+                  </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="address" className="text-right">{t("address")}</Label>
-                  <Input id="address" className="col-span-3" placeholder={t("address")} />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">{t("saveHousehold")}</Button>
-              </DialogFooter>
+                <DialogFooter>
+                  <Button type="submit" disabled={submitting} className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
+                    {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t("saveHousehold")}
+                  </Button>
+                </DialogFooter>
+              </form>
             </DialogContent>
           </Dialog>
         </div>
@@ -107,12 +165,26 @@ export default function HouseholdsManagement() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredHouseholds.map((household) => (
-              <TableRow key={household.id}>
-                <TableCell className="font-medium font-mono">{household.householdNo}</TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={4} className="h-24 text-center">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
+                </TableCell>
+              </TableRow>
+            ) : filteredHouseholds.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">{t("noHouseholdsFound")}</TableCell>
+              </TableRow>
+            ) : filteredHouseholds.map((household) => (
+              <TableRow 
+                key={household.id} 
+                className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                onClick={() => setSelectedHousehold(household)}
+              >
+                <TableCell className="font-medium font-mono">{household.houseNumber}</TableCell>
                 <TableCell>{household.address}</TableCell>
-                <TableCell>{household.membersCount} {t("members")}</TableCell>
-                <TableCell className="text-right">
+                <TableCell>{household.residents?.length || 0} {t("members")}</TableCell>
+                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950">
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -122,14 +194,60 @@ export default function HouseholdsManagement() {
                 </TableCell>
               </TableRow>
             ))}
-            {filteredHouseholds.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">{t("noHouseholdsFound")}</TableCell>
-              </TableRow>
-            )}
           </TableBody>
         </Table>
       </div>
+
+      {/* View Members Modal */}
+      <Dialog open={!!selectedHousehold} onOpenChange={(open) => !open && setSelectedHousehold(null)}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("householdMembers")}</DialogTitle>
+            <DialogDescription>
+              {selectedHousehold?.houseNumber} - {selectedHousehold?.address}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {selectedHousehold?.residents && selectedHousehold.residents.length > 0 ? (
+              <div className="rounded-md border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-slate-50 dark:bg-slate-800/50">
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>NIC</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {selectedHousehold.residents.map((resident: any) => (
+                      <TableRow key={resident.id}>
+                        <TableCell className="font-medium">{resident.fullName}</TableCell>
+                        <TableCell>{resident.nic || 'N/A'}</TableCell>
+                        <TableCell>
+                          <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                            resident.isVerified ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                          }`}>
+                            {resident.isVerified ? 'Verified' : 'Pending'}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                <p>No members registered for this household yet.</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setSelectedHousehold(null)} className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
