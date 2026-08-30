@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
@@ -21,8 +21,14 @@ export const metadata: Metadata = {
   title: "Grama Niladhari System",
   description: "Official Grama Niladhari System for residents and officers",
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
   themeColor: "#003366",
-  viewport: "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
+  viewportFit: "cover",
 };
 
 export default async function RootLayout({
