@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import csvParser = require('csv-parser');
 import { Readable } from 'stream';
@@ -8,6 +8,19 @@ export class HouseholdsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createHouseholdDto: any, wasamaId: string) {
+    const existing = await this.prisma.household.findUnique({
+      where: {
+        houseNumber_wasamaId: {
+          houseNumber: createHouseholdDto.houseNumber,
+          wasamaId,
+        }
+      }
+    });
+
+    if (existing) {
+      throw new ConflictException('A household with this number already exists in your Wasama');
+    }
+
     return this.prisma.household.create({
       data: {
         houseNumber: createHouseholdDto.houseNumber,
@@ -48,9 +61,7 @@ export class HouseholdsService {
     return this.prisma.household.findMany({
       where: { wasamaId },
       include: {
-        _count: {
-          select: { residents: true },
-        },
+        residents: true,
       },
     });
   }
