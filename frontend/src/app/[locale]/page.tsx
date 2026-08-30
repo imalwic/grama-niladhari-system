@@ -66,6 +66,8 @@ export default function LoginPage() {
             alt="Sri Lanka National Emblem"
             width={80}
             height={80}
+            priority
+            style={{ width: "auto", height: "auto" }}
             className="mb-4 drop-shadow-md"
           />
           <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">
