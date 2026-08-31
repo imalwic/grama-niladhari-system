@@ -60,6 +60,13 @@ export default function ResidentRegistration() {
   const [email, setEmail] = useState("");
   const [householdNo, setHouseholdNo] = useState("");
   const [address, setAddress] = useState("");
+  
+  const [gender, setGender] = useState("");
+  const [maritalStatus, setMaritalStatus] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [highestEducation, setHighestEducation] = useState("");
+  const [religion, setReligion] = useState("");
+  
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   
@@ -119,6 +126,11 @@ export default function ResidentRegistration() {
         wasamaCode: wasama,
         householdNo,
         address,
+        gender,
+        maritalStatus,
+        occupation,
+        highestEducation,
+        religion,
         consentGiven
       };
 
@@ -176,6 +188,8 @@ export default function ResidentRegistration() {
             alt="Sri Lanka National Emblem"
             width={60}
             height={60}
+            priority
+            style={{ width: "auto", height: "auto" }}
             className="mb-2"
           />
           <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">
@@ -248,6 +262,64 @@ export default function ResidentRegistration() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required 
+                    className="dark:bg-slate-800 dark:border-slate-700" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gender">{t("gender")}</Label>
+                  <Select value={gender} onValueChange={setGender} required>
+                    <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Male">{t("male")}</SelectItem>
+                      <SelectItem value="Female">{t("female")}</SelectItem>
+                      <SelectItem value="Other">{t("otherGender")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="maritalStatus">{t("maritalStatus")}</Label>
+                  <Select value={maritalStatus} onValueChange={setMaritalStatus} required>
+                    <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Unmarried">{t("unmarried")}</SelectItem>
+                      <SelectItem value="Married">{t("married")}</SelectItem>
+                      <SelectItem value="Divorced">{t("divorced")}</SelectItem>
+                      <SelectItem value="Widowed">{t("widowed")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="occupation">{t("occupation")}</Label>
+                  <Input 
+                    id="occupation" 
+                    value={occupation}
+                    onChange={(e) => setOccupation(e.target.value)}
+                    placeholder="E.g. Teacher, Engineer, Student"
+                    required 
+                    className="dark:bg-slate-800 dark:border-slate-700" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="highestEducation">{t("highestEducation")}</Label>
+                  <Input 
+                    id="highestEducation" 
+                    value={highestEducation}
+                    onChange={(e) => setHighestEducation(e.target.value)}
+                    placeholder="E.g. O/L, A/L, Degree"
+                    className="dark:bg-slate-800 dark:border-slate-700" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="religion">{t("religion")}</Label>
+                  <Input 
+                    id="religion" 
+                    value={religion}
+                    onChange={(e) => setReligion(e.target.value)}
+                    placeholder="E.g. Buddhism, Hinduism, Islam, Christianity"
                     className="dark:bg-slate-800 dark:border-slate-700" 
                   />
                 </div>
