@@ -6,25 +6,51 @@ export class ResidentsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createResidentDto: any, wasamaId: string) {
-    // Ensure the household belongs to the GN officer's wasama
-    const household = await this.prisma.household.findFirst({
-      where: { id: createResidentDto.householdId, wasamaId },
-    });
-    if (!household) {
-      throw new NotFoundException('Household not found in your Wasama');
+    let householdId = createResidentDto.householdId;
+
+    if (!householdId && createResidentDto.householdNo) {
+      let household = await this.prisma.household.findUnique({
+        where: {
+          houseNumber_wasamaId: {
+            houseNumber: createResidentDto.householdNo,
+            wasamaId,
+          }
+        }
+      });
+
+      if (!household) {
+        household = await this.prisma.household.create({
+          data: {
+            houseNumber: createResidentDto.householdNo,
+            address: 'Pending Address',
+            wasamaId,
+          }
+        });
+      }
+      householdId = household.id;
+    }
+
+    if (!householdId) {
+      throw new NotFoundException('Household information is required');
     }
 
     return this.prisma.resident.create({
       data: {
         nic: createResidentDto.nic,
         fullName: createResidentDto.fullName,
-        dateOfBirth: new Date(createResidentDto.dateOfBirth),
-        relationshipToHead: createResidentDto.relationshipToHead,
-        isHeadOfHousehold: createResidentDto.isHeadOfHousehold,
+        dateOfBirth: createResidentDto.dateOfBirth ? new Date(createResidentDto.dateOfBirth) : new Date(),
+        relationshipToHead: createResidentDto.relationshipToHead || 'Resident',
+        isHeadOfHousehold: createResidentDto.isHeadOfHousehold || false,
         phone: createResidentDto.phone,
-        householdId: createResidentDto.householdId,
-        consentGiven: createResidentDto.consentGiven,
-        consentDate: createResidentDto.consentGiven ? new Date() : null,
+        gender: createResidentDto.gender,
+        maritalStatus: createResidentDto.maritalStatus,
+        occupation: createResidentDto.occupation,
+        highestEducation: createResidentDto.highestEducation,
+        religion: createResidentDto.religion,
+        householdId: householdId,
+        consentGiven: createResidentDto.consentGiven || true,
+        consentDate: new Date(),
+        isVerified: true, // Auto verify when GN officer adds them
       },
     });
   }
