@@ -120,7 +120,6 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
-    // Create Resident and User in a transaction
     const result = await this.prisma.$transaction(async (prisma) => {
       const resident = await prisma.resident.create({
         data: {
@@ -129,6 +128,11 @@ export class AuthService {
           dateOfBirth: new Date(dto.dob),
           relationshipToHead: 'Resident', // Default
           phone: dto.phone,
+          gender: dto.gender,
+          maritalStatus: dto.maritalStatus,
+          occupation: dto.occupation,
+          highestEducation: dto.highestEducation,
+          religion: dto.religion,
           consentGiven: dto.consentGiven,
           consentDate: new Date(),
           isVerified: false,
