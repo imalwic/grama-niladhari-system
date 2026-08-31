@@ -122,6 +122,12 @@ model Resident {
   isVerified         Boolean  @default(false) // GN Approval Status
   phone              String?
 
+  gender             String?
+  maritalStatus      String?
+  occupation         String?
+  highestEducation   String?
+  religion           String?
+
   householdId String?
   household   Household? @relation(fields: [householdId], references: [id])
 
