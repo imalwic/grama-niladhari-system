@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Home, FileText, CheckCircle, UserCheck } from "lucide-react";
+import { Users, Home, FileText, CheckCircle, UserCheck, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
@@ -50,13 +50,36 @@ export default function GnOfficerDashboard() {
     fetchStats();
   }, []);
 
+  const handleDownloadReport = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:3001/wasamas/dashboard-report", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      }
+    } catch (err) {
+      console.error("Failed to download report", err);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("title")}</h1>
-        <p className="text-muted-foreground">
-          {subtitle || t("subtitle")}
-        </p>
+      <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("title")}</h1>
+          <p className="text-muted-foreground">
+            {subtitle || t("subtitle")}
+          </p>
+        </div>
+        <Button onClick={handleDownloadReport} variant="outline" className="border-[#003366] text-[#003366] hover:bg-blue-50 dark:border-blue-500 dark:text-blue-400 dark:hover:bg-slate-800">
+          <Download className="w-4 h-4 mr-2" /> Download Report
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
