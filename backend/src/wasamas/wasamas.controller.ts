@@ -5,7 +5,9 @@ import {
   Body,
   UseGuards,
   Request,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { WasamasService } from './wasamas.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -21,6 +23,23 @@ export class WasamasController {
   @Roles(Role.GN_OFFICER)
   getDashboardStats(@Request() req: any) {
     return this.wasamasService.getDashboardStats(req.user.wasamaId);
+  }
+
+  @Get('dashboard-report')
+  @Roles(Role.GN_OFFICER)
+  async getDashboardReportPdf(@Request() req: any, @Res() res: Response) {
+    const pdfBuffer = await this.wasamasService.generateDashboardReportPdf(
+      req.user.wasamaId,
+      req.user.wasamaName || 'Your Wasama' // Note: may need to adjust based on payload
+    );
+    
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `inline; filename="wasama-report-${new Date().toISOString().split('T')[0]}.pdf"`,
+      'Content-Length': pdfBuffer.length,
+    });
+    
+    res.end(pdfBuffer);
   }
 
   @Post()
