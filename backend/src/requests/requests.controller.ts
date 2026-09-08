@@ -36,7 +36,7 @@ export class RequestsController {
   @Patch(':id/status')
   @Roles(Role.GN_OFFICER)
   updateStatus(@Param('id') id: string, @Body() updateData: any, @Request() req: any) {
-    return this.requestsService.updateStatus(id, updateData.status, req.user.sub, updateData.notes);
+    return this.requestsService.updateStatus(id, updateData.status, req.user.sub, updateData.notes, updateData.signatureBase64);
   }
 
   @Get(':id/certificate')
@@ -50,7 +50,12 @@ export class RequestsController {
       throw new BadRequestException('Certificate is not yet approved');
     }
 
-    const pdfBuffer = await this.pdfService.generateCertificate(request);
+    let reviewer = null;
+    if (request.reviewedById) {
+      reviewer = await this.requestsService.getReviewerDetails(request.reviewedById);
+    }
+
+    const pdfBuffer = await this.pdfService.generateCertificate(request, reviewer);
     
     res.set({
       'Content-Type': 'application/pdf',
