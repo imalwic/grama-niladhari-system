@@ -4,7 +4,7 @@ import * as QRCode from 'qrcode';
 
 @Injectable()
 export class PdfService {
-  async generateCertificate(request: any): Promise<Buffer> {
+  async generateCertificate(request: any, reviewer?: any): Promise<Buffer> {
     return new Promise(async (resolve, reject) => {
       try {
         const doc = new PDFDocument({ margin: 50, size: 'A4' });
@@ -72,9 +72,19 @@ export class PdfService {
         doc.moveDown(4);
 
         // Signature Line
-        doc.font('Helvetica');
-        doc.text('......................................................', { align: 'right' });
-        doc.text('Signature / Seal of Grama Niladhari', { align: 'right' });
+        if (reviewer && reviewer.signatureData) {
+           const base64Data = reviewer.signatureData.replace(/^data:image\/png;base64,/, "");
+           const imgBuffer = Buffer.from(base64Data, 'base64');
+           // Place signature image above the text on the right side
+           doc.image(imgBuffer, doc.page.width - 170, doc.y - 20, { width: 100 });
+           doc.moveDown(3);
+           doc.font('Helvetica').text(`E-Signed by ${reviewer.name}`, { align: 'right' });
+        } else {
+           doc.font('Helvetica');
+           doc.text('......................................................', { align: 'right' });
+        }
+        
+        doc.font('Helvetica').text('Signature / Seal of Grama Niladhari', { align: 'right' });
 
         // Generate QR Code
         if (request.qrCodeToken) {
