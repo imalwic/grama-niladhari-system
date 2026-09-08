@@ -75,13 +75,27 @@ export class RequestsService {
     });
   }
 
-  async updateStatus(id: string, status: any, gnOfficerId: string, notes?: string) {
+  async getReviewerDetails(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, signatureData: true }
+    });
+  }
+
+  async updateStatus(id: string, status: any, gnOfficerId: string, notes?: string, signatureBase64?: string) {
     let certificateUrl = null;
     let qrCodeToken = null;
 
     if (status === 'APPROVED') {
       certificateUrl = `/certificates/certificate-${id}.pdf`;
       qrCodeToken = `CERT-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+      
+      if (signatureBase64) {
+        await this.prisma.user.update({
+          where: { id: gnOfficerId },
+          data: { signatureData: signatureBase64 }
+        });
+      }
     }
 
     const updatedRequest = await this.prisma.request.update({
