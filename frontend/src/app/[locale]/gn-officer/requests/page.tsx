@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import SignatureCanvas from "react-signature-canvas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -25,6 +26,7 @@ export default function GnOfficerRequests() {
   const [searchTerm, setSearchTerm] = useState("");
   const [reviewNotes, setReviewNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const sigCanvas = useRef<any>(null);
   
   const t = useTranslations("GnOfficer");
   const c = useTranslations("Common");
@@ -66,11 +68,17 @@ export default function GnOfficerRequests() {
 
   const handleUpdateStatus = async (id: string, status: string) => {
     setSubmitting(true);
+    let signatureBase64 = undefined;
+    
+    if (status === "APPROVED" && sigCanvas.current && !sigCanvas.current.isEmpty()) {
+      signatureBase64 = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
+    }
+
     try {
       const res = await fetch(`http://localhost:3001/requests/${id}/status`, {
         method: "PATCH",
         headers: getAuthHeaders(),
-        body: JSON.stringify({ status, notes: reviewNotes }),
+        body: JSON.stringify({ status, notes: reviewNotes, signatureBase64 }),
       });
       if (res.ok) {
         setReviewNotes("");
@@ -164,7 +172,12 @@ export default function GnOfficerRequests() {
                 <TableCell>{getStatusBadge(req.status)}</TableCell>
                 <TableCell className="text-right">
                   {req.status === "PENDING" && (
-                    <Dialog onOpenChange={(open) => { if(!open) setReviewNotes(""); }}>
+                    <Dialog onOpenChange={(open) => { 
+                      if(!open) {
+                         setReviewNotes(""); 
+                         if (sigCanvas.current) sigCanvas.current.clear();
+                      }
+                    }}>
                       <DialogTrigger render={
                          <Button variant="outline" size="sm" className="h-8 border-[#003366] text-[#003366] hover:bg-slate-50 dark:border-blue-500 dark:text-blue-400 dark:hover:bg-slate-800 dark:hover:text-blue-300">
                            {t("review")}
@@ -201,6 +214,20 @@ export default function GnOfficerRequests() {
                                 onChange={(e) => setReviewNotes(e.target.value)}
                                 className="dark:bg-slate-800 dark:border-slate-700" 
                               />
+                           </div>
+                           <div className="space-y-2">
+                              <Label className="flex justify-between items-center">
+                                Digital Signature
+                                <Button variant="ghost" size="sm" className="h-6 text-xs text-slate-500" onClick={() => sigCanvas.current?.clear()}>Clear</Button>
+                              </Label>
+                              <div className="border rounded-md bg-white dark:bg-slate-800 dark:border-slate-700 overflow-hidden">
+                                <SignatureCanvas 
+                                  ref={sigCanvas} 
+                                  penColor="blue"
+                                  canvasProps={{className: 'w-full h-24'}} 
+                                />
+                              </div>
+                              <p className="text-[10px] text-muted-foreground leading-tight">Draw your signature above to digitally sign the generated certificate. If you have signed previously, you may leave this blank to use your saved signature.</p>
                            </div>
                         </div>
                         <DialogFooter className="flex-row sm:justify-between gap-2 pt-2">
