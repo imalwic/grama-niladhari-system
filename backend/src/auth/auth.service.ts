@@ -27,6 +27,7 @@ export class AuthService {
       role: user.role,
       wasamaId: user.wasamaId,
       pradeshiyaSabhaId: user.pradeshiyaSabhaId,
+      residentId: user.residentId,
     };
     return {
       access_token: this.jwtService.sign(payload),

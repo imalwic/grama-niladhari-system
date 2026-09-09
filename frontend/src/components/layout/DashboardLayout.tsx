@@ -50,6 +50,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: "Dashboard", href: "/gn-officer", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: "Households", href: "/gn-officer/households", icon: <Home className="h-5 w-5" /> },
     { name: "Residents", href: "/gn-officer/residents", icon: <Users className="h-5 w-5" /> },
+    { name: "Requests", href: "/gn-officer/requests", icon: <FileText className="h-5 w-5" /> },
     { name: "Notices", href: "/gn-officer/notices", icon: <Bell className="h-5 w-5" /> },
     { name: "Settings", href: "/gn-officer/settings", icon: <Settings className="h-5 w-5" /> },
   ];
