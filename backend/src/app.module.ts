@@ -9,6 +9,7 @@ import { ResidentsModule } from './residents/residents.module';
 import { NoticesModule } from './notices/notices.module';
 import { RequestsModule } from './requests/requests.module';
 import { CategoriesModule } from './categories/categories.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { PrismaModule } from './prisma/prisma.module';
     NoticesModule,
     RequestsModule,
     CategoriesModule,
+    NotificationsModule,
     PrismaModule,
   ],
   controllers: [AppController],

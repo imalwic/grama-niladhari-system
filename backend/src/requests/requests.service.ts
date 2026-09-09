@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class RequestsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService
+  ) {}
 
   async create(data: any, residentId: string) {
     return this.prisma.request.create({
@@ -70,7 +74,7 @@ export class RequestsService {
       qrCodeToken = `CERT-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
     }
 
-    return this.prisma.request.update({
+    const updatedRequest = await this.prisma.request.update({
       where: { id },
       data: {
         status,
@@ -78,6 +82,20 @@ export class RequestsService {
         reviewNotes: notes,
         ...(status === 'APPROVED' ? { certificateUrl, qrCodeToken } : {})
       },
+      include: { resident: { include: { userAccount: true } } }
     });
+
+    // Fire notification
+    const userId = updatedRequest.resident.userAccount?.id;
+    if (userId) {
+       await this.notificationsService.createNotification(
+         userId,
+         `Request ${status}`,
+         `Your request for ${updatedRequest.requestType} has been ${status}. ${notes ? `Notes: ${notes}` : ''}`,
+         status === 'APPROVED' ? 'SUCCESS' : status === 'REJECTED' ? 'ERROR' : 'INFO'
+       );
+    }
+    
+    return updatedRequest;
   }
 }
