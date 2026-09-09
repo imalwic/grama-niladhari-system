@@ -1,0 +1,14 @@
+{
+  "Navigation": {
+    "dashboard": "උපකරණ පුවරුව (Tamil mocked)",
+    "requests": "ඉල්ලීම් (Tamil mocked)",
+    "notices": "දැන්වීම් පුවරුව (Tamil mocked)",
+    "profile": "පැතිකඩ (Tamil mocked)"
+  },
+  "Common": {
+    "login": "உள்நுழை",
+    "logout": "வெளியேறு",
+    "welcome": "கிராம உத்தியோகத்தர் முறைமைக்கு வரவேற்கிறோம்",
+    "language": "மொழி"
+  }
+}

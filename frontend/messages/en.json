@@ -1,0 +1,14 @@
+{
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "requests": "Requests",
+    "notices": "Notice Board",
+    "profile": "Profile"
+  },
+  "Common": {
+    "login": "Login",
+    "logout": "Logout",
+    "welcome": "Welcome to Grama Niladhari System",
+    "language": "Language"
+  }
+}
