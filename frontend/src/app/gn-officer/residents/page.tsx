@@ -35,11 +35,11 @@ export default function ResidentsManagement() {
         <div className="flex gap-2">
           {/* Add New Component */}
           <Dialog>
-            <DialogTrigger asChild>
+            <DialogTrigger render={
               <Button className="bg-[#003366] hover:bg-[#002244]">
                 <Plus className="mr-2 h-4 w-4" /> Add Resident
               </Button>
-            </DialogTrigger>
+            } />
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Register New Resident</DialogTitle>

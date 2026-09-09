@@ -110,7 +110,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                 </p>
              </div>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger render={
                 <Button variant="secondary" size="icon" className="rounded-full shadow-sm">
                   <Avatar className="h-9 w-9">
                     <AvatarFallback className="bg-[#003366] text-white">
@@ -119,7 +119,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                   </Avatar>
                   <span className="sr-only">Toggle user menu</span>
                 </Button>
-              </DropdownMenuTrigger>
+              } />
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />

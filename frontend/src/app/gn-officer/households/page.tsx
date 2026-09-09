@@ -32,11 +32,11 @@ export default function HouseholdsManagement() {
         <div className="flex gap-2">
           {/* Bulk Upload Component */}
           <Dialog>
-            <DialogTrigger asChild>
+            <DialogTrigger render={
               <Button variant="outline" className="border-[#003366] text-[#003366]">
                 <UploadCloud className="mr-2 h-4 w-4" /> Bulk Import
               </Button>
-            </DialogTrigger>
+            } />
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Bulk Import Households</DialogTitle>
@@ -62,11 +62,11 @@ export default function HouseholdsManagement() {
 
           {/* Add New Component */}
           <Dialog>
-            <DialogTrigger asChild>
+            <DialogTrigger render={
               <Button className="bg-[#003366] hover:bg-[#002244]">
                 <Plus className="mr-2 h-4 w-4" /> Add Household
               </Button>
-            </DialogTrigger>
+            } />
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Register New Household</DialogTitle>

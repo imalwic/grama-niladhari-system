@@ -31,11 +31,11 @@ export default function GnManagement() {
           <p className="text-muted-foreground">Manage all Grama Niladhari officers in the Pradeshiya Sabha.</p>
         </div>
         <Dialog>
-          <DialogTrigger asChild>
+          <DialogTrigger render={
             <Button className="bg-[#003366] hover:bg-[#002244]">
               <Plus className="mr-2 h-4 w-4" /> Add New Officer
             </Button>
-          </DialogTrigger>
+          } />
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Register New GN Officer</DialogTitle>
