@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// -----------------------------------------------------------------------------
+// ENUMS
+// -----------------------------------------------------------------------------
+
+enum Role {
+  SUPER_ADMIN
+  GN_OFFICER
+  RESIDENT
+}
+
+enum RequestStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  READY_FOR_COLLECTION
+}
+
+enum NoticeType {
+  GENERAL
+  ALERT
+  DEVELOPMENT
+}
+
+// -----------------------------------------------------------------------------
+// MODELS
+// -----------------------------------------------------------------------------
+
+model PradeshiyaSabha {
+  id          String   @id @default(uuid())
+  name        String
+  district    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  wasamas     Wasama[]
+  users       User[]   // Super admins belong to PS directly
+}
+
+model Wasama {
+  id                String   @id @default(uuid())
+  name              String
+  code              String   @unique
+  pradeshiyaSabhaId String
+  pradeshiyaSabha   PradeshiyaSabha @relation(fields: [pradeshiyaSabhaId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  officers          User[]   // GN Officers assigned to this Wasama
+  households        Household[]
+  notices           Notice[]
+}
+
+model User {
+  id                String   @id @default(uuid())
+  nic               String   @unique
+  name              String
+  email             String?  @unique
+  phone             String?
+  passwordHash      String
+  role              Role     @default(RESIDENT)
+  
+  // Relations based on role
+  pradeshiyaSabhaId String?  // For SUPER_ADMIN
+  pradeshiyaSabha   PradeshiyaSabha? @relation(fields: [pradeshiyaSabhaId], references: [id])
+  
+  wasamaId          String?  // For GN_OFFICER
+  wasama            Wasama?  @relation(fields: [wasamaId], references: [id])
+
+  residentId        String?  @unique // For RESIDENT (links to Resident profile)
+  residentProfile   Resident? @relation(fields: [residentId], references: [id])
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Household {
+  id                String   @id @default(uuid())
+  houseNumber       String
+  address           String
+  wasamaId          String
+  wasama            Wasama   @relation(fields: [wasamaId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  residents         Resident[]
+  
+  @@unique([houseNumber, wasamaId])
+}
+
+model Resident {
+  id                String   @id @default(uuid())
+  nic               String?  @unique // Children might not have NIC
+  fullName          String
+  dateOfBirth       DateTime
+  relationshipToHead String
+  isHeadOfHousehold Boolean  @default(false)
+  phone             String?
+  
+  householdId       String
+  household         Household @relation(fields: [householdId], references: [id])
+
+  // System link
+  userAccount       User?    // Reverse relation from User table
+
+  // Explicit consent for PDPA
+  consentGiven      Boolean  @default(false)
+  consentDate       DateTime?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  categoryTags      ResidentCategory[]
+  requests          Request[]
+}
+
+model Category {
+  id                String   @id @default(uuid())
+  code              String   @unique // e.g., SC-01, GE-01
+  name              String   // e.g., School Children, Government Employee
+  description       String?
+
+  residents         ResidentCategory[]
+}
+
+// Join table for many-to-many relation
+model ResidentCategory {
+  residentId        String
+  categoryId        String
+  resident          Resident @relation(fields: [residentId], references: [id])
+  category          Category @relation(fields: [categoryId], references: [id])
+
+  @@id([residentId, categoryId])
+}
+
+model Notice {
+  id                String   @id @default(uuid())
+  title             String
+  content           String
+  type              NoticeType @default(GENERAL)
+  wasamaId          String
+  wasama            Wasama   @relation(fields: [wasamaId], references: [id])
+  publishedById     String   // The GN officer who published it
+  expiresAt         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Request {
+  id                String   @id @default(uuid())
+  requestType       String   // e.g., "Income Certificate", "Address Confirmation"
+  reason            String?
+  supportingDocsUrl String?  // URL to uploaded docs
+  status            RequestStatus @default(PENDING)
+  
+  // PDF Generation data
+  certificateUrl    String?  // URL to the generated PDF
+  qrCodeToken       String?  @unique // Token to verify the PDF
+  
+  residentId        String
+  resident          Resident @relation(fields: [residentId], references: [id])
+  reviewedById      String?  // The GN officer who reviewed it
+  reviewNotes       String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
