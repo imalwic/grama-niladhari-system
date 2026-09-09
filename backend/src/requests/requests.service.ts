@@ -45,6 +45,21 @@ export class RequestsService {
     });
   }
 
+  async findByIdWithDetails(id: string) {
+    return this.prisma.request.findUnique({
+      where: { id },
+      include: {
+        resident: {
+          include: {
+            household: {
+              include: { wasama: true }
+            }
+          }
+        }
+      }
+    });
+  }
+
   async updateStatus(id: string, status: any, gnOfficerId: string, notes?: string) {
     let certificateUrl = null;
     let qrCodeToken = null;

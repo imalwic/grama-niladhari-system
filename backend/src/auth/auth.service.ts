@@ -91,7 +91,7 @@ export class AuthService {
           consentGiven: dto.consentGiven,
           consentDate: new Date(),
           isVerified: false,
-          householdId: householdId,
+          householdId: householdId || undefined,
         },
       });
 
