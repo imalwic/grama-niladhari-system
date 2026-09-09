@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ResidentsService } from './residents.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -30,8 +40,16 @@ export class ResidentsController {
 
   @Patch(':id')
   @Roles(Role.GN_OFFICER)
-  update(@Param('id') id: string, @Body() updateResidentDto: any, @Request() req: any) {
-    return this.residentsService.update(id, updateResidentDto, req.user.wasamaId);
+  update(
+    @Param('id') id: string,
+    @Body() updateResidentDto: any,
+    @Request() req: any,
+  ) {
+    return this.residentsService.update(
+      id,
+      updateResidentDto,
+      req.user.wasamaId,
+    );
   }
 
   @Delete(':id')

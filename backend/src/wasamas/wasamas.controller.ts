@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { WasamasService } from './wasamas.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -13,7 +20,10 @@ export class WasamasController {
   @Post()
   @Roles(Role.SUPER_ADMIN)
   createWasama(@Body() createWasamaDto: any, @Request() req: any) {
-    return this.wasamasService.createWasama(createWasamaDto, req.user.pradeshiyaSabhaId);
+    return this.wasamasService.createWasama(
+      createWasamaDto,
+      req.user.pradeshiyaSabhaId,
+    );
   }
 
   @Get()
@@ -25,6 +35,9 @@ export class WasamasController {
   @Post('officers')
   @Roles(Role.SUPER_ADMIN)
   createOfficer(@Body() createOfficerDto: any, @Request() req: any) {
-    return this.wasamasService.createOfficer(createOfficerDto, req.user.pradeshiyaSabhaId);
+    return this.wasamasService.createOfficer(
+      createOfficerDto,
+      req.user.pradeshiyaSabhaId,
+    );
   }
 }

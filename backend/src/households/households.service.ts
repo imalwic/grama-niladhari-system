@@ -26,14 +26,14 @@ export class HouseholdsService {
         .on('end', async () => {
           try {
             // Bulk insert
-            const formattedData = results.map(row => ({
+            const formattedData = results.map((row) => ({
               houseNumber: row.houseNumber,
               address: row.address,
-              wasamaId: wasamaId
+              wasamaId: wasamaId,
             }));
             await this.prisma.household.createMany({
               data: formattedData,
-              skipDuplicates: true
+              skipDuplicates: true,
             });
             resolve({ success: true, count: formattedData.length });
           } catch (error) {

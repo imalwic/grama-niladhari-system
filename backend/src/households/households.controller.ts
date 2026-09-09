@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HouseholdsService } from './households.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -20,7 +32,10 @@ export class HouseholdsController {
   @Post('bulk-import')
   @Roles(Role.GN_OFFICER)
   @UseInterceptors(FileInterceptor('file'))
-  async bulkImport(@UploadedFile() file: Express.Multer.File, @Request() req: any) {
+  async bulkImport(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: any,
+  ) {
     return this.householdsService.bulkImport(file.buffer, req.user.wasamaId);
   }
 
@@ -38,8 +53,16 @@ export class HouseholdsController {
 
   @Patch(':id')
   @Roles(Role.GN_OFFICER)
-  update(@Param('id') id: string, @Body() updateHouseholdDto: any, @Request() req: any) {
-    return this.householdsService.update(id, updateHouseholdDto, req.user.wasamaId);
+  update(
+    @Param('id') id: string,
+    @Body() updateHouseholdDto: any,
+    @Request() req: any,
+  ) {
+    return this.householdsService.update(
+      id,
+      updateHouseholdDto,
+      req.user.wasamaId,
+    );
   }
 
   @Delete(':id')

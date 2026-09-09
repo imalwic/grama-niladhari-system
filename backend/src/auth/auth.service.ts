@@ -12,7 +12,7 @@ export class AuthService {
 
   async validateUser(nic: string, pass: string): Promise<any> {
     const user = await this.prisma.user.findUnique({ where: { nic } });
-    if (user && await bcrypt.compare(pass, user.passwordHash)) {
+    if (user && (await bcrypt.compare(pass, user.passwordHash))) {
       const { passwordHash, ...result } = user;
       return result;
     }
@@ -20,20 +20,20 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { 
-        sub: user.id, 
-        nic: user.nic, 
-        role: user.role,
-        wasamaId: user.wasamaId,
-        pradeshiyaSabhaId: user.pradeshiyaSabhaId
+    const payload = {
+      sub: user.id,
+      nic: user.nic,
+      role: user.role,
+      wasamaId: user.wasamaId,
+      pradeshiyaSabhaId: user.pradeshiyaSabhaId,
     };
     return {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
         name: user.name,
-        role: user.role
-      }
+        role: user.role,
+      },
     };
   }
 }

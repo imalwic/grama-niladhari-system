@@ -22,12 +22,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    return { 
-      id: user.id, 
-      nic: user.nic, 
+    return {
+      id: user.id,
+      nic: user.nic,
       role: user.role,
       wasamaId: user.wasamaId,
-      pradeshiyaSabhaId: user.pradeshiyaSabhaId 
+      pradeshiyaSabhaId: user.pradeshiyaSabhaId,
     };
   }
 }

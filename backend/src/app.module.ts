@@ -12,7 +12,17 @@ import { CategoriesModule } from './categories/categories.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, WasamasModule, HouseholdsModule, ResidentsModule, NoticesModule, RequestsModule, CategoriesModule, PrismaModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    WasamasModule,
+    HouseholdsModule,
+    ResidentsModule,
+    NoticesModule,
+    RequestsModule,
+    CategoriesModule,
+    PrismaModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

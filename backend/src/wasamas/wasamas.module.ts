@@ -4,6 +4,6 @@ import { WasamasService } from './wasamas.service';
 
 @Module({
   controllers: [WasamasController],
-  providers: [WasamasService]
+  providers: [WasamasService],
 })
 export class WasamasModule {}

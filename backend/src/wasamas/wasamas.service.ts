@@ -21,19 +21,19 @@ export class WasamasService {
       where: { pradeshiyaSabhaId },
       include: {
         officers: {
-          select: { id: true, name: true, email: true, phone: true }
+          select: { id: true, name: true, email: true, phone: true },
         },
         _count: {
-          select: { households: true }
-        }
-      }
+          select: { households: true },
+        },
+      },
     });
   }
 
   async createOfficer(createOfficerDto: any, pradeshiyaSabhaId: string) {
     // Validate the wasama exists and belongs to this PS
     const wasama = await this.prisma.wasama.findFirst({
-      where: { id: createOfficerDto.wasamaId, pradeshiyaSabhaId }
+      where: { id: createOfficerDto.wasamaId, pradeshiyaSabhaId },
     });
     if (!wasama) {
       throw new NotFoundException('Wasama not found in your Pradeshiya Sabha');

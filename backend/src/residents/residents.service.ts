@@ -32,22 +32,25 @@ export class ResidentsService {
   async findAllByWasama(wasamaId: string) {
     return this.prisma.resident.findMany({
       where: {
-        household: { wasamaId }
+        household: { wasamaId },
       },
       include: {
         household: true,
-        categoryTags: { include: { category: true } }
-      }
+        categoryTags: { include: { category: true } },
+      },
     });
   }
 
   async findOne(id: string, wasamaId: string) {
     const resident = await this.prisma.resident.findFirst({
-      where: { 
-        id, 
-        household: { wasamaId } 
+      where: {
+        id,
+        household: { wasamaId },
       },
-      include: { household: true, categoryTags: { include: { category: true } } },
+      include: {
+        household: true,
+        categoryTags: { include: { category: true } },
+      },
     });
     if (!resident) {
       throw new NotFoundException('Resident not found in your Wasama');
