@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as csvParser from 'csv-parser';
+import csvParser = require('csv-parser');
 import { Readable } from 'stream';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class HouseholdsService {
   }
 
   async bulkImport(fileBuffer: Buffer, wasamaId: string) {
-    const results = [];
+    const results: any[] = [];
     return new Promise((resolve, reject) => {
       Readable.from(fileBuffer)
         .pipe(csvParser())

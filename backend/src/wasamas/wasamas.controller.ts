@@ -12,19 +12,19 @@ export class WasamasController {
 
   @Post()
   @Roles(Role.SUPER_ADMIN)
-  createWasama(@Body() createWasamaDto: any, @Request() req) {
+  createWasama(@Body() createWasamaDto: any, @Request() req: any) {
     return this.wasamasService.createWasama(createWasamaDto, req.user.pradeshiyaSabhaId);
   }
 
   @Get()
   @Roles(Role.SUPER_ADMIN)
-  findAll(@Request() req) {
+  findAll(@Request() req: any) {
     return this.wasamasService.findAllWasamas(req.user.pradeshiyaSabhaId);
   }
 
   @Post('officers')
   @Roles(Role.SUPER_ADMIN)
-  createOfficer(@Body() createOfficerDto: any, @Request() req) {
+  createOfficer(@Body() createOfficerDto: any, @Request() req: any) {
     return this.wasamasService.createOfficer(createOfficerDto, req.user.pradeshiyaSabhaId);
   }
 }

@@ -13,38 +13,38 @@ export class HouseholdsController {
 
   @Post()
   @Roles(Role.GN_OFFICER)
-  create(@Body() createHouseholdDto: any, @Request() req) {
+  create(@Body() createHouseholdDto: any, @Request() req: any) {
     return this.householdsService.create(createHouseholdDto, req.user.wasamaId);
   }
 
   @Post('bulk-import')
   @Roles(Role.GN_OFFICER)
   @UseInterceptors(FileInterceptor('file'))
-  async bulkImport(@UploadedFile() file: Express.Multer.File, @Request() req) {
+  async bulkImport(@UploadedFile() file: Express.Multer.File, @Request() req: any) {
     return this.householdsService.bulkImport(file.buffer, req.user.wasamaId);
   }
 
   @Get()
   @Roles(Role.GN_OFFICER)
-  findAll(@Request() req) {
+  findAll(@Request() req: any) {
     return this.householdsService.findAllByWasama(req.user.wasamaId);
   }
 
   @Get(':id')
   @Roles(Role.GN_OFFICER)
-  findOne(@Param('id') id: string, @Request() req) {
+  findOne(@Param('id') id: string, @Request() req: any) {
     return this.householdsService.findOne(id, req.user.wasamaId);
   }
 
   @Patch(':id')
   @Roles(Role.GN_OFFICER)
-  update(@Param('id') id: string, @Body() updateHouseholdDto: any, @Request() req) {
+  update(@Param('id') id: string, @Body() updateHouseholdDto: any, @Request() req: any) {
     return this.householdsService.update(id, updateHouseholdDto, req.user.wasamaId);
   }
 
   @Delete(':id')
   @Roles(Role.GN_OFFICER)
-  remove(@Param('id') id: string, @Request() req) {
+  remove(@Param('id') id: string, @Request() req: any) {
     return this.householdsService.remove(id, req.user.wasamaId);
   }
 }
