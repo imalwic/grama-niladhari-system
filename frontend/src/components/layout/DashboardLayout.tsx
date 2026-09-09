@@ -11,7 +11,8 @@ import {
   Settings, 
   LogOut,
   Bell,
-  Menu
+  Menu,
+  FileText
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,14 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: "Settings", href: "/gn-officer/settings", icon: <Settings className="h-5 w-5" /> },
   ];
 
-  const navigation = role === "SUPER_ADMIN" ? superAdminNav : gnOfficerNav;
+  const residentNav: SidebarItem[] = [
+    { name: "Dashboard", href: "/resident", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { name: "My Household", href: "/resident/household", icon: <Home className="h-5 w-5" /> },
+    { name: "Certificates", href: "/resident/requests", icon: <FileText className="h-5 w-5" /> },
+    { name: "Notices", href: "/resident/notices", icon: <Bell className="h-5 w-5" /> },
+  ];
+
+  const navigation = role === "SUPER_ADMIN" ? superAdminNav : role === "GN_OFFICER" ? gnOfficerNav : residentNav;
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-slate-50">
@@ -97,7 +105,9 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
           <div className="flex flex-1 items-center justify-end gap-4">
              <div className="hidden sm:block text-right">
                 <p className="text-sm font-medium leading-none text-[#003366]">{user.name}</p>
-                <p className="text-xs text-slate-500 mt-1">{role === "SUPER_ADMIN" ? "Pradeshiya Sabha Admin" : "Grama Niladhari"}</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {role === "SUPER_ADMIN" ? "Pradeshiya Sabha Admin" : role === "GN_OFFICER" ? "Grama Niladhari" : "Resident"}
+                </p>
              </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

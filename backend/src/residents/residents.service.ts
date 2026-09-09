@@ -66,6 +66,34 @@ export class ResidentsService {
     });
   }
 
+  async approve(id: string, wasamaId: string, householdId?: string) {
+    const resident = await this.prisma.resident.findUnique({
+      where: { id },
+      include: { household: true },
+    });
+
+    if (!resident) {
+      throw new NotFoundException('Resident not found');
+    }
+
+    // Since the resident might not have a household yet (pending), we can't use findOne logic directly
+    // Instead we check if they are requesting a household in this wasama
+    if (resident.householdId) {
+      if (resident.household?.wasamaId !== wasamaId) {
+        throw new NotFoundException('Resident household belongs to a different Wasama');
+      }
+    }
+
+    // Update the resident to verified, optionally setting the household
+    return this.prisma.resident.update({
+      where: { id },
+      data: {
+        isVerified: true,
+        ...(householdId && { householdId }),
+      },
+    });
+  }
+
   async remove(id: string, wasamaId: string) {
     await this.findOne(id, wasamaId); // Verify access
     return this.prisma.resident.delete({

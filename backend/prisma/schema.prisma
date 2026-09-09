@@ -109,10 +109,11 @@ model Resident {
   dateOfBirth       DateTime
   relationshipToHead String
   isHeadOfHousehold Boolean  @default(false)
+  isVerified        Boolean  @default(false) // GN Approval Status
   phone             String?
   
-  householdId       String
-  household         Household @relation(fields: [householdId], references: [id])
+  householdId       String?
+  household         Household? @relation(fields: [householdId], references: [id])
 
   // System link
   userAccount       User?    // Reverse relation from User table

@@ -52,6 +52,16 @@ export class ResidentsController {
     );
   }
 
+  @Patch(':id/approve')
+  @Roles(Role.GN_OFFICER)
+  approve(
+    @Param('id') id: string,
+    @Body('householdId') householdId: string,
+    @Request() req: any,
+  ) {
+    return this.residentsService.approve(id, req.user.wasamaId, householdId);
+  }
+
   @Delete(':id')
   @Roles(Role.GN_OFFICER)
   remove(@Param('id') id: string, @Request() req: any) {
