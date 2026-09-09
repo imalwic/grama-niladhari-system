@@ -10,5 +10,18 @@
     "logout": "Logout",
     "welcome": "Welcome to Grama Niladhari System",
     "language": "Language"
+  },
+  "Login": {
+    "title": "Grama Niladhari System",
+    "subtitle": "Secure portal for Pradeshiya Sabha and Grama Niladhari Officers",
+    "signIn": "Sign In",
+    "credentialsHint": "Enter your credentials to access your portal.",
+    "emailLabel": "Email or NIC",
+    "emailPlaceholder": "e.g., admin@gov.lk",
+    "passwordLabel": "Password",
+    "forgotPassword": "Forgot password?",
+    "signingIn": "Signing In...",
+    "residentPrompt": "Are you a resident?",
+    "registerHere": "Register here"
   }
 }
