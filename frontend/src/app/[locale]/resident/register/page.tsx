@@ -16,7 +16,7 @@ import { useTranslations } from "next-intl";
 export default function ResidentRegistration() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [consentGiven, setConsentGiven] = useState(false);
-  const t = useTranslations("Resident");
+  const t = useTranslations("Registration");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,13 +33,13 @@ export default function ResidentRegistration() {
             <div className="flex justify-center mb-4">
               <CheckCircle2 className="h-16 w-16 text-green-600" />
             </div>
-            <CardTitle className="text-2xl">{t("registrationSubmitted")}</CardTitle>
+            <CardTitle className="text-2xl">{t("submittedTitle")}</CardTitle>
             <CardDescription>
-              {t("regSubmitDesc")}
+              {t("submittedDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-sm text-slate-600 dark:text-slate-300">
-            {t("regWaitMsg")}
+            {t("submittedInfo")}
           </CardContent>
           <CardFooter>
             <Link href="/" className="w-full">
@@ -63,10 +63,10 @@ export default function ResidentRegistration() {
             className="mb-2"
           />
           <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">
-            {t("residentRegistration")}
+            {t("title")}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            {t("createDigitalAccount")}
+            {t("subtitle")}
           </p>
         </div>
 
@@ -102,7 +102,7 @@ export default function ResidentRegistration() {
 
               {/* Address Info */}
               <div className="space-y-4 pt-4 border-t dark:border-slate-800">
-                <h3 className="text-sm font-medium leading-none">{t("residentialInformation")}</h3>
+                <h3 className="text-sm font-medium leading-none">{t("residentialInfo")}</h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="wasama">{t("gnDivision")}</Label>
@@ -111,19 +111,19 @@ export default function ResidentRegistration() {
                         <SelectValue placeholder={t("selectWasama")} />
                       </SelectTrigger>
                       <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                        <SelectItem value="WN-102">{t("wasama1")}</SelectItem>
-                        <SelectItem value="WS-103">{t("wasama2")}</SelectItem>
-                        <SelectItem value="MD-201">{t("wasama3")}</SelectItem>
+                        <SelectItem value="WN-102">WN-102 Weeraketiya North</SelectItem>
+                        <SelectItem value="WS-103">WS-103 Weeraketiya South</SelectItem>
+                        <SelectItem value="MD-201">MD-201 Medamulana</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="householdNo">{t("householdNoOpt")}</Label>
-                    <Input id="householdNo" placeholder={t("ifKnownH001")} className="dark:bg-slate-800 dark:border-slate-700" />
+                    <Label htmlFor="householdNo">{t("householdNumber")}</Label>
+                    <Input id="householdNo" placeholder={t("ifKnown")} className="dark:bg-slate-800 dark:border-slate-700" />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="address">{t("permanentAddress")}</Label>
-                    <Input id="address" placeholder={t("fullResAddress")} required className="dark:bg-slate-800 dark:border-slate-700" />
+                    <Input id="address" placeholder={t("fullAddress")} required className="dark:bg-slate-800 dark:border-slate-700" />
                   </div>
                 </div>
               </div>
@@ -149,16 +149,16 @@ export default function ResidentRegistration() {
                 <ScrollArea className="h-32 rounded-md border p-4 bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
                   <p className="mb-2"><strong>{t("pdpaTitle")}</strong></p>
                   <p className="mb-2">
-                    {t("pdpaDesc1")}
+                    {t("pdpaBody")}
                   </p>
                   <p className="mb-2">
-                    {t("iUnderstandThat")}
+                    {t("pdpaUnderstand")}
                   </p>
                   <ul className="list-disc pl-4 space-y-1">
-                    <li>{t("pdpaPoint1")}</li>
-                    <li>{t("pdpaPoint2")}</li>
-                    <li>{t("pdpaPoint3")}</li>
-                    <li>{t("pdpaPoint4")}</li>
+                    <li>{t("pdpaSecure")}</li>
+                    <li>{t("pdpaAccess")}</li>
+                    <li>{t("pdpaRight")}</li>
+                    <li>{t("pdpaNotify")}</li>
                   </ul>
                 </ScrollArea>
                 <div className="flex items-start space-x-2">
@@ -174,7 +174,7 @@ export default function ResidentRegistration() {
                       htmlFor="consent"
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                     >
-                      {t("iAgreePdpa")}
+                      {t("agreeConsent")}
                     </label>
                   </div>
                 </div>
