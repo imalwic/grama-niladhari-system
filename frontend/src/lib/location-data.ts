@@ -71,11 +71,25 @@ export const DIVISIONAL_SECS: Record<string, string[]> = {
 
 export const GN_DIVISIONS: Record<string, {id: string, name: string}[]> = {
   "Weeraketiya": [
-    { id: "WN-102", name: "Weeraketiya North" },
-    { id: "WS-103", name: "Weeraketiya South" },
-    { id: "MD-201", name: "Medamulana" },
-    { id: "H-123", name: "Hakuruwela" },
-    { id: "N-456", name: "Nihiluwa" },
-    { id: "B-789", name: "Bedigama" }
+    { id: "WK-01", name: "Weeraketiya North" },
+    { id: "WK-02", name: "Weeraketiya South" },
+    { id: "WK-03", name: "Weeraketiya East" },
+    { id: "WK-04", name: "Weeraketiya West" },
+    { id: "WK-05", name: "Mandaduwa" },
+    { id: "WK-06", name: "Medamulana" },
+    { id: "WK-07", name: "Hakuruwela" },
+    { id: "WK-08", name: "Nihiluwa" },
+    { id: "WK-09", name: "Agrahera" },
+    { id: "WK-10", name: "Bedigama North" },
+    { id: "WK-11", name: "Bedigama South" },
+    { id: "WK-12", name: "Bedigama East" },
+    { id: "WK-13", name: "Bedigama West" },
+    { id: "WK-14", name: "Kuda Bedigama" },
+    { id: "WK-15", name: "Mulgirigala North" },
+    { id: "WK-16", name: "Mulgirigala South" },
+    { id: "WK-17", name: "Mulgirigala East" },
+    { id: "WK-18", name: "Mulgirigala West" },
+    { id: "WK-19", name: "Buddhiyagama East" },
+    { id: "WK-20", name: "Buddhiyagama West" }
   ]
 };
