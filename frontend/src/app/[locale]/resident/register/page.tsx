@@ -187,8 +187,8 @@ export default function ResidentRegistration() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="district">District</Label>
-                    <Select value={district} onValueChange={(val) => { setDistrict(val); setDivisionalSec(""); setWasama(""); }} disabled={!province} required>
-                      <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
+                    <Select value={district} onValueChange={(val) => { setDistrict(val); setDivisionalSec(""); setWasama(""); }} required>
+                      <SelectTrigger disabled={!province} className="dark:bg-slate-800 dark:border-slate-700">
                         <SelectValue placeholder="Select District" />
                       </SelectTrigger>
                       <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
@@ -200,8 +200,8 @@ export default function ResidentRegistration() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="divisionalSec">Divisional Secretariat</Label>
-                    <Select value={divisionalSec} onValueChange={(val) => { setDivisionalSec(val); setWasama(""); }} disabled={!district} required>
-                      <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
+                    <Select value={divisionalSec} onValueChange={(val) => { setDivisionalSec(val); setWasama(""); }} required>
+                      <SelectTrigger disabled={!district} className="dark:bg-slate-800 dark:border-slate-700">
                         <SelectValue placeholder="Select Division" />
                       </SelectTrigger>
                       <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
@@ -216,8 +216,8 @@ export default function ResidentRegistration() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="wasama">{t("gnDivision")}</Label>
-                    <Select value={wasama} onValueChange={setWasama} disabled={!divisionalSec} required>
-                      <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
+                    <Select value={wasama} onValueChange={setWasama} required>
+                      <SelectTrigger disabled={!divisionalSec} className="dark:bg-slate-800 dark:border-slate-700">
                         <SelectValue placeholder={t("selectWasama")} />
                       </SelectTrigger>
                       <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
