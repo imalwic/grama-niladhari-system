@@ -40,12 +40,22 @@ function extractDobFromNic(nic: string): string {
   return `${year}-${month}-${date}`;
 }
 
-const PROVINCES = ["Southern Province", "Western Province", "Central Province"];
+const PROVINCES = [
+  "Western Province", "Central Province", "Southern Province",
+  "Uva Province", "Sabaragamuwa Province", "North Western Province",
+  "North Central Province", "Northern Province", "Eastern Province"
+];
 
 const DISTRICTS: Record<string, string[]> = {
-  "Southern Province": ["Hambantota", "Galle", "Matara"],
   "Western Province": ["Colombo", "Gampaha", "Kalutara"],
-  "Central Province": ["Kandy", "Matale", "Nuwara Eliya"]
+  "Central Province": ["Kandy", "Matale", "Nuwara Eliya"],
+  "Southern Province": ["Galle", "Matara", "Hambantota"],
+  "Uva Province": ["Badulla", "Monaragala"],
+  "Sabaragamuwa Province": ["Kegalle", "Ratnapura"],
+  "North Western Province": ["Kurunegala", "Puttalam"],
+  "North Central Province": ["Anuradhapura", "Polonnaruwa"],
+  "Northern Province": ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
+  "Eastern Province": ["Trincomalee", "Batticaloa", "Ampara"]
 };
 
 const DIVISIONAL_SECS: Record<string, string[]> = {
