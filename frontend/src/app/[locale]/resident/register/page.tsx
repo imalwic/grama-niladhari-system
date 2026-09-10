@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { PROVINCES, DISTRICTS, DIVISIONAL_SECS, GN_DIVISIONS } from "@/lib/location-data";
 
 function extractDobFromNic(nic: string): string {
   let year = "";
@@ -39,37 +40,6 @@ function extractDobFromNic(nic: string): string {
   
   return `${year}-${month}-${date}`;
 }
-
-const PROVINCES = [
-  "Western Province", "Central Province", "Southern Province",
-  "Uva Province", "Sabaragamuwa Province", "North Western Province",
-  "North Central Province", "Northern Province", "Eastern Province"
-];
-
-const DISTRICTS: Record<string, string[]> = {
-  "Western Province": ["Colombo", "Gampaha", "Kalutara"],
-  "Central Province": ["Kandy", "Matale", "Nuwara Eliya"],
-  "Southern Province": ["Galle", "Matara", "Hambantota"],
-  "Uva Province": ["Badulla", "Monaragala"],
-  "Sabaragamuwa Province": ["Kegalle", "Ratnapura"],
-  "North Western Province": ["Kurunegala", "Puttalam"],
-  "North Central Province": ["Anuradhapura", "Polonnaruwa"],
-  "Northern Province": ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
-  "Eastern Province": ["Trincomalee", "Batticaloa", "Ampara"]
-};
-
-const DIVISIONAL_SECS: Record<string, string[]> = {
-  "Hambantota": ["Weeraketiya", "Tangalle", "Beliatta", "Walasmulla", "Katuwana"],
-  "Colombo": ["Colombo", "Dehiwala", "Homagama"]
-};
-
-const GN_DIVISIONS: Record<string, {id: string, name: string}[]> = {
-  "Weeraketiya": [
-    { id: "WN-102", name: "Weeraketiya North" },
-    { id: "WS-103", name: "Weeraketiya South" },
-    { id: "MD-201", name: "Medamulana" }
-  ]
-};
 
 export default function ResidentRegistration() {
   const [isSubmitted, setIsSubmitted] = useState(false);
