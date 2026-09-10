@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -141,15 +142,17 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                 </Button>
               } />
               <DropdownMenuContent align="end" className="dark:bg-slate-900 dark:border-slate-800">
-                <DropdownMenuLabel className="dark:text-slate-200">{common("myAccount")}</DropdownMenuLabel>
-                <DropdownMenuSeparator className="dark:bg-slate-800" />
-                <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{nav("settings")}</DropdownMenuItem>
-                <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{common("support")}</DropdownMenuItem>
-                <DropdownMenuSeparator className="dark:bg-slate-800" />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400 dark:focus:bg-slate-800 cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  {common("logout")}
-                </DropdownMenuItem>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="dark:text-slate-200">{common("myAccount")}</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="dark:bg-slate-800" />
+                  <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{nav("settings")}</DropdownMenuItem>
+                  <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{common("support")}</DropdownMenuItem>
+                  <DropdownMenuSeparator className="dark:bg-slate-800" />
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400 dark:focus:bg-slate-800 cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {common("logout")}
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
