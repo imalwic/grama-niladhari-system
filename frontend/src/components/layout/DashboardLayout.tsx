@@ -106,6 +106,15 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
             })}
           </nav>
         </div>
+        <div className="border-t dark:border-slate-800 p-4">
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+          >
+            <LogOut className="h-5 w-5" />
+            {common("logout")}
+          </button>
+        </div>
       </aside>
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-64">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white dark:bg-slate-900 dark:border-slate-800 px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 shadow-sm sm:shadow-none transition-colors">
