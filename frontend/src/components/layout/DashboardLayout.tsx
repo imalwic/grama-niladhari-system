@@ -147,11 +147,6 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                   <DropdownMenuSeparator className="dark:bg-slate-800" />
                   <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{nav("settings")}</DropdownMenuItem>
                   <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{common("support")}</DropdownMenuItem>
-                  <DropdownMenuSeparator className="dark:bg-slate-800" />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400 dark:focus:bg-slate-800 cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    {common("logout")}
-                  </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
