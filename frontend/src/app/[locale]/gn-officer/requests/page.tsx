@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Search, FileText, CheckCircle2, XCircle, FileSignature } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const MOCK_REQUESTS = [
   { id: "REQ-001", residentName: "Kamal Perera", nic: "198012345678", type: "Income Certificate", status: "PENDING", submittedDate: "2023-10-25" },
@@ -20,6 +21,8 @@ export default function GnOfficerRequests() {
   const [requests, setRequests] = useState(MOCK_REQUESTS);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReq, setSelectedReq] = useState<any>(null);
+  const t = useTranslations("GnOfficer");
+  const c = useTranslations("Common");
 
   const filteredRequests = requests.filter(r => 
     r.residentName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -29,9 +32,9 @@ export default function GnOfficerRequests() {
 
   const getStatusBadge = (status: string) => {
     switch(status) {
-      case "APPROVED": return <Badge className="bg-green-600">Approved</Badge>;
-      case "PENDING": return <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-200">Needs Review</Badge>;
-      case "REJECTED": return <Badge variant="destructive">Rejected</Badge>;
+      case "APPROVED": return <Badge className="bg-green-600 dark:bg-green-700">{c("approved")}</Badge>;
+      case "PENDING": return <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900 dark:text-orange-200 dark:border-orange-800">{t("needsReview")}</Badge>;
+      case "REJECTED": return <Badge variant="destructive">{c("rejected")}</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
   };
@@ -40,8 +43,8 @@ export default function GnOfficerRequests() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#003366]">Certificate Requests</h1>
-          <p className="text-muted-foreground">Review and approve resident requests to generate PDFs.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("certificateRequests")}</h1>
+          <p className="text-muted-foreground">{t("reviewRequests")}</p>
         </div>
       </div>
 
@@ -49,7 +52,7 @@ export default function GnOfficerRequests() {
         <div className="relative w-full">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by Resident Name, NIC, or Type..."
+            placeholder={t("searchRequests")}
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -57,15 +60,15 @@ export default function GnOfficerRequests() {
         </div>
       </div>
 
-      <div className="rounded-md border bg-white shadow-sm">
+      <div className="rounded-md border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Resident</TableHead>
-              <TableHead>Certificate Type</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{c("resident")}</TableHead>
+              <TableHead>{t("certificateType")}</TableHead>
+              <TableHead>{t("date")}</TableHead>
+              <TableHead>{c("status")}</TableHead>
+              <TableHead className="text-right">{c("actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -73,7 +76,7 @@ export default function GnOfficerRequests() {
               <TableRow key={req.id}>
                 <TableCell>
                   <div className="font-medium">{req.residentName}</div>
-                  <div className="text-xs text-slate-500">{req.nic}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">{req.nic}</div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center">
@@ -87,41 +90,41 @@ export default function GnOfficerRequests() {
                   {req.status === "PENDING" && (
                     <Dialog>
                       <DialogTrigger render={
-                         <Button variant="outline" size="sm" className="h-8 border-[#003366] text-[#003366] hover:bg-slate-50">
-                           Review
+                         <Button variant="outline" size="sm" className="h-8 border-[#003366] text-[#003366] hover:bg-slate-50 dark:border-blue-500 dark:text-blue-400 dark:hover:bg-slate-800 dark:hover:text-blue-300">
+                           {t("review")}
                          </Button>
                       } />
-                      <DialogContent>
+                      <DialogContent className="dark:bg-slate-900 dark:border-slate-800">
                         <DialogHeader>
-                          <DialogTitle>Review Request: {req.type}</DialogTitle>
+                          <DialogTitle>{t("reviewRequest")}: {req.type}</DialogTitle>
                           <DialogDescription>
-                            Review the details and issue the certificate or reject the request.
+                            {t("reviewRequestDesc")}
                           </DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
-                           <div className="bg-slate-50 p-4 rounded-md text-sm">
-                              <p><strong>Resident:</strong> {req.residentName} ({req.nic})</p>
-                              <p className="mt-2"><strong>Reason for Request:</strong> Needs to submit to the bank for a housing loan.</p>
+                           <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-md text-sm">
+                              <p><strong>{c("resident")}:</strong> {req.residentName} ({req.nic})</p>
+                              <p className="mt-2"><strong>{t("reasonForRequest")}:</strong> {t("bankLoanReason")}</p>
                            </div>
                            <div className="space-y-2">
-                              <Label>GN Officer Notes (Visible on Rejection)</Label>
-                              <Textarea placeholder="If rejecting, explain why..." />
+                              <Label>{t("gnNotes")}</Label>
+                              <Textarea placeholder={t("rejectExplanation")} className="dark:bg-slate-800 dark:border-slate-700" />
                            </div>
                         </div>
                         <DialogFooter className="flex-row sm:justify-between gap-2">
                           <Button variant="destructive" className="w-full sm:w-auto">
-                            <XCircle className="w-4 h-4 mr-2"/> Reject
+                            <XCircle className="w-4 h-4 mr-2"/> {t("reject")}
                           </Button>
-                          <Button className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
-                            <CheckCircle2 className="w-4 h-4 mr-2"/> Approve & Generate PDF
+                          <Button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white">
+                            <CheckCircle2 className="w-4 h-4 mr-2"/> {t("approveGenerate")}
                           </Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
                   )}
                   {req.status === "APPROVED" && (
-                    <Button variant="ghost" size="sm" className="h-8 text-slate-500" disabled>
-                      Processed
+                    <Button variant="ghost" size="sm" className="h-8 text-slate-500 dark:text-slate-400" disabled>
+                      {t("processed")}
                     </Button>
                   )}
                 </TableCell>
@@ -130,7 +133,7 @@ export default function GnOfficerRequests() {
             {filteredRequests.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  No requests found.
+                  {t("noRequestsFound")}
                 </TableCell>
               </TableRow>
             )}

@@ -15,8 +15,9 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() signInDto: Record<string, any>) {
+    const identifier = signInDto.email || signInDto.nic || signInDto.identifier;
     const user = await this.authService.validateUser(
-      signInDto.nic,
+      identifier,
       signInDto.password,
     );
     if (!user) {
