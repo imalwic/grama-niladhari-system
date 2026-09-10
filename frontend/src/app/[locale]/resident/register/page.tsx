@@ -13,10 +13,51 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+function extractDobFromNic(nic: string): string {
+  let year = "";
+  let days = 0;
+  
+  if (nic.length === 10 && /[vVxX]$/i.test(nic)) {
+    year = "19" + nic.substring(0, 2);
+    days = parseInt(nic.substring(2, 5));
+  } else if (nic.length === 12 && /^\d+$/.test(nic)) {
+    year = nic.substring(0, 4);
+    days = parseInt(nic.substring(4, 7));
+  } else {
+    return "";
+  }
+  
+  if (days > 500) {
+    days -= 500;
+  }
+  
+  if (days < 1 || days > 366) return "";
+  
+  const d = new Date(1992, 0, days);
+  const month = (d.getMonth() + 1).toString().padStart(2, "0");
+  const date = d.getDate().toString().padStart(2, "0");
+  
+  return `${year}-${month}-${date}`;
+}
+
 export default function ResidentRegistration() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [consentGiven, setConsentGiven] = useState(false);
+  const [nic, setNic] = useState("");
+  const [dob, setDob] = useState("");
   const t = useTranslations("Registration");
+
+  const handleNicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim();
+    setNic(value);
+    
+    if (value.length === 10 || value.length === 12) {
+      const dobStr = extractDobFromNic(value);
+      if (dobStr) {
+        setDob(dobStr);
+      }
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +125,14 @@ export default function ResidentRegistration() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="nic">{t("nicNumber")}</Label>
-                  <Input id="nic" placeholder={t("nicPlaceholder")} required className="dark:bg-slate-800 dark:border-slate-700" />
+                  <Input 
+                    id="nic" 
+                    placeholder={t("nicPlaceholder")} 
+                    value={nic}
+                    onChange={handleNicChange}
+                    required 
+                    className="dark:bg-slate-800 dark:border-slate-700" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="fullName">{t("fullName")}</Label>
@@ -92,11 +140,26 @@ export default function ResidentRegistration() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">{t("mobileNumber")}</Label>
-                  <Input id="phone" type="tel" placeholder="07XXXXXXXX" required className="dark:bg-slate-800 dark:border-slate-700" />
+                  <Input 
+                    id="phone" 
+                    type="tel" 
+                    placeholder="07XXXXXXXX" 
+                    maxLength={10}
+                    pattern="[0-9]{10}"
+                    required 
+                    className="dark:bg-slate-800 dark:border-slate-700" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="dob">{t("dateOfBirth")}</Label>
-                  <Input id="dob" type="date" required className="dark:bg-slate-800 dark:border-slate-700" />
+                  <Input 
+                    id="dob" 
+                    type="date" 
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                    required 
+                    className="dark:bg-slate-800 dark:border-slate-700" 
+                  />
                 </div>
               </div>
 
