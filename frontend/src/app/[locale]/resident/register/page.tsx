@@ -40,11 +40,36 @@ function extractDobFromNic(nic: string): string {
   return `${year}-${month}-${date}`;
 }
 
+const PROVINCES = ["Southern Province", "Western Province", "Central Province"];
+
+const DISTRICTS: Record<string, string[]> = {
+  "Southern Province": ["Hambantota", "Galle", "Matara"],
+  "Western Province": ["Colombo", "Gampaha", "Kalutara"],
+  "Central Province": ["Kandy", "Matale", "Nuwara Eliya"]
+};
+
+const DIVISIONAL_SECS: Record<string, string[]> = {
+  "Hambantota": ["Weeraketiya", "Tangalle", "Beliatta", "Walasmulla", "Katuwana"],
+  "Colombo": ["Colombo", "Dehiwala", "Homagama"]
+};
+
+const GN_DIVISIONS: Record<string, {id: string, name: string}[]> = {
+  "Weeraketiya": [
+    { id: "WN-102", name: "Weeraketiya North" },
+    { id: "WS-103", name: "Weeraketiya South" },
+    { id: "MD-201", name: "Medamulana" }
+  ]
+};
+
 export default function ResidentRegistration() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [consentGiven, setConsentGiven] = useState(false);
   const [nic, setNic] = useState("");
   const [dob, setDob] = useState("");
+  const [province, setProvince] = useState("");
+  const [district, setDistrict] = useState("");
+  const [divisionalSec, setDivisionalSec] = useState("");
+  const [wasama, setWasama] = useState("");
   const t = useTranslations("Registration");
 
   const handleNicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,19 +193,65 @@ export default function ResidentRegistration() {
                 <h3 className="text-sm font-medium leading-none">{t("residentialInfo")}</h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="wasama">{t("gnDivision")}</Label>
-                    <Select required>
+                    <Label htmlFor="province">Province</Label>
+                    <Select value={province} onValueChange={(val) => { setProvince(val); setDistrict(""); setDivisionalSec(""); setWasama(""); }} required>
                       <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
-                        <SelectValue placeholder={t("selectWasama")} />
+                        <SelectValue placeholder="Select Province" />
                       </SelectTrigger>
                       <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                        <SelectItem value="WN-102">WN-102 Weeraketiya North</SelectItem>
-                        <SelectItem value="WS-103">WS-103 Weeraketiya South</SelectItem>
-                        <SelectItem value="MD-201">MD-201 Medamulana</SelectItem>
+                        {PROVINCES.map(p => (
+                          <SelectItem key={p} value={p}>{p}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="district">District</Label>
+                    <Select value={district} onValueChange={(val) => { setDistrict(val); setDivisionalSec(""); setWasama(""); }} disabled={!province} required>
+                      <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
+                        <SelectValue placeholder="Select District" />
+                      </SelectTrigger>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                        {(DISTRICTS[province] || []).map(d => (
+                          <SelectItem key={d} value={d}>{d}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="divisionalSec">Divisional Secretariat</Label>
+                    <Select value={divisionalSec} onValueChange={(val) => { setDivisionalSec(val); setWasama(""); }} disabled={!district} required>
+                      <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
+                        <SelectValue placeholder="Select Division" />
+                      </SelectTrigger>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                        {(DIVISIONAL_SECS[district] || []).map(ds => (
+                          <SelectItem key={ds} value={ds}>{ds}</SelectItem>
+                        ))}
+                        {(!DIVISIONAL_SECS[district] || DIVISIONAL_SECS[district].length === 0) && district && (
+                           <SelectItem value="unsupported_district" disabled>Divisions not added yet</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="wasama">{t("gnDivision")}</Label>
+                    <Select value={wasama} onValueChange={setWasama} disabled={!divisionalSec} required>
+                      <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
+                        <SelectValue placeholder={t("selectWasama")} />
+                      </SelectTrigger>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                        {GN_DIVISIONS[divisionalSec] ? (
+                          GN_DIVISIONS[divisionalSec].map(gn => (
+                            <SelectItem key={gn.id} value={gn.id}>{gn.id} {gn.name}</SelectItem>
+                          ))
+                        ) : divisionalSec && divisionalSec !== "unsupported_district" ? (
+                          <SelectItem value="unsupported_ds" disabled>GN divisions not added yet</SelectItem>
+                        ) : null}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="householdNo">{t("householdNumber")}</Label>
                     <Input id="householdNo" placeholder={t("ifKnown")} className="dark:bg-slate-800 dark:border-slate-700" />
                   </div>
