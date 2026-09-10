@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link, useRouter } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,8 +55,16 @@ export default function ResidentRegistration() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [householdNo, setHouseholdNo] = useState("");
+  const [address, setAddress] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   
   const t = useTranslations("Registration");
+  const router = useRouter();
 
   const provinceOptions = PROVINCES.map(p => ({ value: p, label: p }));
   const districtOptions = (DISTRICTS[province] || []).map(d => ({ value: d, label: d }));
@@ -92,12 +100,44 @@ export default function ResidentRegistration() {
   const isStrongPassword = hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
   const isPasswordMatch = password === confirmPassword;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!consentGiven) return;
     if (!isStrongPassword || !isPasswordMatch) return;
-    // In a real app, API call happens here
-    setIsSubmitted(true);
+    
+    setIsLoading(true);
+    setErrorMsg("");
+
+    try {
+      const payload = {
+        nic,
+        fullName,
+        dob,
+        phone,
+        email,
+        password,
+        wasamaCode: wasama,
+        householdNo,
+        consentGiven
+      };
+
+      const res = await fetch("http://localhost:3001/auth/register/resident", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Registration failed");
+      }
+
+      setIsSubmitted(true);
+    } catch (error: any) {
+      setErrorMsg(error.message || "Something went wrong.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSubmitted) {
@@ -152,6 +192,7 @@ export default function ResidentRegistration() {
               <CardDescription>
                 {t("personalDetailsDesc")}
               </CardDescription>
+              {errorMsg && <div className="text-red-500 text-sm font-semibold mt-2">{errorMsg}</div>}
             </CardHeader>
             <CardContent className="space-y-6">
               
@@ -170,7 +211,7 @@ export default function ResidentRegistration() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="fullName">{t("fullName")}</Label>
-                  <Input id="fullName" placeholder={t("asPerNic")} required className="dark:bg-slate-800 dark:border-slate-700" />
+                  <Input id="fullName" placeholder={t("asPerNic")} value={fullName} onChange={(e) => setFullName(e.target.value)} required className="dark:bg-slate-800 dark:border-slate-700" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">{t("mobileNumber")}</Label>
@@ -180,6 +221,8 @@ export default function ResidentRegistration() {
                     placeholder="07XXXXXXXX" 
                     maxLength={10}
                     pattern="[0-9]{10}"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     required 
                     className="dark:bg-slate-800 dark:border-slate-700" 
                   />
@@ -201,6 +244,8 @@ export default function ResidentRegistration() {
                     id="email" 
                     type="email" 
                     placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required 
                     className="dark:bg-slate-800 dark:border-slate-700" 
                   />
@@ -268,11 +313,11 @@ export default function ResidentRegistration() {
                   </div>
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="householdNo">{t("householdNumber")}</Label>
-                    <Input id="householdNo" placeholder={t("ifKnown")} className="dark:bg-slate-800 dark:border-slate-700" />
+                    <Input id="householdNo" value={householdNo} onChange={(e) => setHouseholdNo(e.target.value)} placeholder={t("ifKnown")} className="dark:bg-slate-800 dark:border-slate-700" />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="address">{t("permanentAddress")}</Label>
-                    <Input id="address" placeholder={t("fullAddress")} required className="dark:bg-slate-800 dark:border-slate-700" />
+                    <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder={t("fullAddress")} required className="dark:bg-slate-800 dark:border-slate-700" />
                   </div>
                 </div>
               </div>
@@ -380,12 +425,8 @@ export default function ResidentRegistration() {
 
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button 
-                type="submit" 
-                className="w-full bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700 text-white" 
-                disabled={!consentGiven}
-              >
-                {t("submitRegistration")}
+              <Button type="submit" className="w-full bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white" disabled={isLoading}>
+                {isLoading ? "Registering..." : t("submitApp")}
               </Button>
               <div className="text-center text-sm text-slate-500 dark:text-slate-400">
                 {t("alreadyRegistered")}{" "}

@@ -102,6 +102,7 @@ export class AuthService {
         data: {
           nic: dto.nic,
           name: dto.fullName,
+          email: dto.email,
           phone: dto.phone,
           passwordHash,
           role: 'RESIDENT',
