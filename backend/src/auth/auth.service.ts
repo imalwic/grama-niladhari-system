@@ -14,7 +14,18 @@ export class AuthService {
   async validateUser(identifier: string, pass: string): Promise<any> {
     const isEmail = identifier && identifier.includes('@');
     const user = await this.prisma.user.findUnique({ 
-      where: isEmail ? { email: identifier } : { nic: identifier } 
+      where: isEmail ? { email: identifier } : { nic: identifier },
+      include: {
+        residentProfile: {
+          include: {
+            household: {
+              include: {
+                wasama: true,
+              }
+            }
+          }
+        }
+      }
     });
     if (user && (await bcrypt.compare(pass, user.passwordHash))) {
       const { passwordHash, ...result } = user;
@@ -24,11 +35,24 @@ export class AuthService {
   }
 
   async login(user: any) {
+    let wasamaId = user.wasamaId;
+    let wasamaName = null;
+    let householdNo = null;
+
+    if (user.role === 'RESIDENT' && user.residentProfile?.household) {
+      wasamaId = user.residentProfile.household.wasamaId;
+      wasamaName = user.residentProfile.household.wasama?.name;
+      householdNo = user.residentProfile.household.houseNumber;
+    }
+
     const payload = {
       sub: user.id,
       nic: user.nic,
+      name: user.name,
       role: user.role,
-      wasamaId: user.wasamaId,
+      wasamaId: wasamaId,
+      wasamaName: wasamaName,
+      householdNo: householdNo,
       pradeshiyaSabhaId: user.pradeshiyaSabhaId,
       residentId: user.residentId,
     };
@@ -67,7 +91,7 @@ export class AuthService {
     // Attempt to find household, but it's optional for the registration
     let householdId = null;
     if (dto.householdNo) {
-      const household = await this.prisma.household.findUnique({
+      let household = await this.prisma.household.findUnique({
         where: {
           houseNumber_wasamaId: {
             houseNumber: dto.householdNo,
@@ -75,9 +99,16 @@ export class AuthService {
           },
         },
       });
-      if (household) {
-        householdId = household.id;
+      if (!household) {
+        household = await this.prisma.household.create({
+          data: {
+            houseNumber: dto.householdNo,
+            address: dto.address || 'Pending Address',
+            wasamaId: wasama.id,
+          }
+        });
       }
+      householdId = household.id;
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);

@@ -118,6 +118,7 @@ export default function ResidentRegistration() {
         password,
         wasamaCode: wasama,
         householdNo,
+        address,
         consentGiven
       };
 
