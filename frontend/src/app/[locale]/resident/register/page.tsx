@@ -426,7 +426,7 @@ export default function ResidentRegistration() {
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" className="w-full bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white" disabled={isLoading}>
-                {isLoading ? "Registering..." : t("submitApp")}
+                {isLoading ? "Registering..." : t("submitRegistration")}
               </Button>
               <div className="text-center text-sm text-slate-500 dark:text-slate-400">
                 {t("alreadyRegistered")}{" "}
