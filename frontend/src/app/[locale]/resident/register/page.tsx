@@ -195,6 +195,16 @@ export default function ResidentRegistration() {
                     className="dark:bg-slate-800 dark:border-slate-700" 
                   />
                 </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    required 
+                    className="dark:bg-slate-800 dark:border-slate-700" 
+                  />
+                </div>
               </div>
 
               {/* Address Info */}
