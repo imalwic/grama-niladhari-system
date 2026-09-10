@@ -43,6 +43,11 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
   const nav = useTranslations("Navigation");
   const common = useTranslations("Common");
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  };
+
   const superAdminNav: SidebarItem[] = [
     { name: nav("overview"), href: "/super-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("gnOfficers"), href: "/super-admin/gn-officers", icon: <Users className="h-5 w-5" /> },
@@ -132,7 +137,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                 <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{nav("settings")}</DropdownMenuItem>
                 <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{common("support")}</DropdownMenuItem>
                 <DropdownMenuSeparator className="dark:bg-slate-800" />
-                <DropdownMenuItem className="text-red-600 dark:text-red-400 dark:focus:bg-slate-800">
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400 dark:focus:bg-slate-800 cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
                   {common("logout")}
                 </DropdownMenuItem>
