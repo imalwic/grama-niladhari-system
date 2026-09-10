@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -51,6 +52,20 @@ export default function ResidentRegistration() {
   const [divisionalSec, setDivisionalSec] = useState("");
   const [wasama, setWasama] = useState("");
   const t = useTranslations("Registration");
+
+  const provinceOptions = PROVINCES.map(p => ({ value: p, label: p }));
+  const districtOptions = (DISTRICTS[province] || []).map(d => ({ value: d, label: d }));
+  
+  const divisionalSecOptions = (DIVISIONAL_SECS[district] || []).map(ds => ({ value: ds, label: ds }));
+  if ((!DIVISIONAL_SECS[district] || DIVISIONAL_SECS[district].length === 0) && district) {
+    divisionalSecOptions.push({ value: "unsupported_district", label: "Divisions not added yet", disabled: true });
+  }
+
+  const gnOptions = GN_DIVISIONS[divisionalSec] 
+    ? GN_DIVISIONS[divisionalSec].map(gn => ({ value: gn.id, label: `${gn.id} ${gn.name}` }))
+    : divisionalSec && divisionalSec !== "unsupported_district" 
+      ? [{ value: "unsupported_ds", label: "GN divisions not added yet", disabled: true }] 
+      : [];
 
   const handleNicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.trim();
@@ -174,62 +189,58 @@ export default function ResidentRegistration() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="province">Province</Label>
-                    <Select value={province} onValueChange={(val) => { setProvince(val); setDistrict(""); setDivisionalSec(""); setWasama(""); }} required>
-                      <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
-                        <SelectValue placeholder="Select Province" />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                        {PROVINCES.map(p => (
-                          <SelectItem key={p} value={p}>{p}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Combobox 
+                      id="province"
+                      value={province} 
+                      onValueChange={(val) => { setProvince(val); setDistrict(""); setDivisionalSec(""); setWasama(""); }} 
+                      options={provinceOptions}
+                      placeholder="Select Province"
+                      searchPlaceholder="Search Province..."
+                      className="dark:bg-slate-800 dark:border-slate-700 bg-background"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="district">District</Label>
-                    <Select value={district} onValueChange={(val) => { setDistrict(val); setDivisionalSec(""); setWasama(""); }} required>
-                      <SelectTrigger disabled={!province} className="dark:bg-slate-800 dark:border-slate-700">
-                        <SelectValue placeholder="Select District" />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                        {(DISTRICTS[province] || []).map(d => (
-                          <SelectItem key={d} value={d}>{d}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Combobox 
+                      id="district"
+                      value={district} 
+                      onValueChange={(val) => { setDistrict(val); setDivisionalSec(""); setWasama(""); }} 
+                      disabled={!province}
+                      options={districtOptions}
+                      placeholder="Select District"
+                      searchPlaceholder="Search District..."
+                      className="dark:bg-slate-800 dark:border-slate-700 bg-background"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="divisionalSec">Divisional Secretariat</Label>
-                    <Select value={divisionalSec} onValueChange={(val) => { setDivisionalSec(val); setWasama(""); }} required>
-                      <SelectTrigger disabled={!district} className="dark:bg-slate-800 dark:border-slate-700">
-                        <SelectValue placeholder="Select Division" />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                        {(DIVISIONAL_SECS[district] || []).map(ds => (
-                          <SelectItem key={ds} value={ds}>{ds}</SelectItem>
-                        ))}
-                        {(!DIVISIONAL_SECS[district] || DIVISIONAL_SECS[district].length === 0) && district && (
-                           <SelectItem value="unsupported_district" disabled>Divisions not added yet</SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
+                    <Combobox 
+                      id="divisionalSec"
+                      value={divisionalSec} 
+                      onValueChange={(val) => { setDivisionalSec(val); setWasama(""); }} 
+                      disabled={!district}
+                      options={divisionalSecOptions}
+                      placeholder="Select Division"
+                      searchPlaceholder="Search Division..."
+                      className="dark:bg-slate-800 dark:border-slate-700 bg-background"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="wasama">{t("gnDivision")}</Label>
-                    <Select value={wasama} onValueChange={setWasama} required>
-                      <SelectTrigger disabled={!divisionalSec} className="dark:bg-slate-800 dark:border-slate-700">
-                        <SelectValue placeholder={t("selectWasama")} />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                        {GN_DIVISIONS[divisionalSec] ? (
-                          GN_DIVISIONS[divisionalSec].map(gn => (
-                            <SelectItem key={gn.id} value={gn.id}>{gn.id} {gn.name}</SelectItem>
-                          ))
-                        ) : divisionalSec && divisionalSec !== "unsupported_district" ? (
-                          <SelectItem value="unsupported_ds" disabled>GN divisions not added yet</SelectItem>
-                        ) : null}
-                      </SelectContent>
-                    </Select>
+                    <Combobox 
+                      id="wasama"
+                      value={wasama} 
+                      onValueChange={setWasama} 
+                      disabled={!divisionalSec}
+                      options={gnOptions}
+                      placeholder={t("selectWasama")}
+                      searchPlaceholder="Search GN Division..."
+                      className="dark:bg-slate-800 dark:border-slate-700 bg-background"
+                      required
+                    />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="householdNo">{t("householdNumber")}</Label>
