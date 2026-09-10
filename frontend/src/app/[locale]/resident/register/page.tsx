@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Combobox } from "@/components/ui/combobox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { PROVINCES, DISTRICTS, DIVISIONAL_SECS, GN_DIVISIONS } from "@/lib/location-data";
 
@@ -51,6 +51,11 @@ export default function ResidentRegistration() {
   const [district, setDistrict] = useState("");
   const [divisionalSec, setDivisionalSec] = useState("");
   const [wasama, setWasama] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const t = useTranslations("Registration");
 
   const provinceOptions = PROVINCES.map(p => ({ value: p, label: p }));
@@ -79,9 +84,18 @@ export default function ResidentRegistration() {
     }
   };
 
+  const hasMinLength = password.length >= 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+  const isStrongPassword = hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+  const isPasswordMatch = password === confirmPassword;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!consentGiven) return;
+    if (!isStrongPassword || !isPasswordMatch) return;
     // In a real app, API call happens here
     setIsSubmitted(true);
   };
@@ -259,11 +273,60 @@ export default function ResidentRegistration() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="password">{t("createPassword")}</Label>
-                    <Input id="password" type="password" required className="dark:bg-slate-800 dark:border-slate-700" />
+                    <div className="relative">
+                      <Input 
+                        id="password" 
+                        type={showPassword ? "text" : "password"} 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required 
+                        className="dark:bg-slate-800 dark:border-slate-700 pr-10" 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {password.length > 0 && !isStrongPassword && (
+                      <div className="text-xs text-red-500 space-y-1 mt-1">
+                        <p>Password must be strong. Please include:</p>
+                        <ul className="list-disc pl-4">
+                          {!hasMinLength && <li>At least 8 characters</li>}
+                          {!hasUpperCase && <li>One uppercase letter</li>}
+                          {!hasLowerCase && <li>One lowercase letter</li>}
+                          {!hasNumber && <li>One number</li>}
+                          {!hasSpecialChar && <li>One special character</li>}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
-                    <Input id="confirmPassword" type="password" required className="dark:bg-slate-800 dark:border-slate-700" />
+                    <div className="relative">
+                      <Input 
+                        id="confirmPassword" 
+                        type={showConfirmPassword ? "text" : "password"} 
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required 
+                        className="dark:bg-slate-800 dark:border-slate-700 pr-10" 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                        tabIndex={-1}
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {confirmPassword.length > 0 && !isPasswordMatch && (
+                      <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+                    )}
                   </div>
                 </div>
               </div>
