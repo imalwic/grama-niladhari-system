@@ -61,7 +61,7 @@ export default function ResidentRegistration() {
   const provinceOptions = PROVINCES.map(p => ({ value: p, label: p }));
   const districtOptions = (DISTRICTS[province] || []).map(d => ({ value: d, label: d }));
   
-  const divisionalSecOptions = (DIVISIONAL_SECS[district] || []).map(ds => ({ value: ds, label: ds }));
+  const divisionalSecOptions: { value: string; label: string; disabled?: boolean }[] = (DIVISIONAL_SECS[district] || []).map(ds => ({ value: ds, label: ds }));
   if ((!DIVISIONAL_SECS[district] || DIVISIONAL_SECS[district].length === 0) && district) {
     divisionalSecOptions.push({ value: "unsupported_district", label: "Divisions not added yet", disabled: true });
   }
