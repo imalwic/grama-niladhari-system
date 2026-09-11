@@ -35,6 +35,7 @@ export default function ResidentDashboard() {
   const [pendingCount, setPendingCount] = useState(0);
   const [approvedCount, setApprovedCount] = useState(0);
   const [notices, setNotices] = useState<any[]>([]);
+  const [totalNoticesCount, setTotalNoticesCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,6 +60,7 @@ export default function ResidentDashboard() {
         });
         if (noticeRes.ok) {
           const noticeData = await noticeRes.json();
+          setTotalNoticesCount(noticeData.length);
           setNotices(noticeData.slice(0, 3)); // Show latest 3
         }
       } catch (err) {
@@ -147,7 +149,7 @@ export default function ResidentDashboard() {
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             ) : (
               <>
-                <div className="text-2xl font-bold">{notices.length}</div>
+                <div className="text-2xl font-bold">{totalNoticesCount}</div>
                 <p className="text-xs text-muted-foreground">{t("fromGNOfficer")}</p>
               </>
             )}
