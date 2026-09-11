@@ -76,6 +76,7 @@ export default function ResidentDashboard() {
   const welcomeName = userData?.name || "Resident";
   const wasamaName = userData?.wasamaName || "";
   const householdNo = userData?.householdNo || "";
+  const isVerified = userData?.isVerified || false;
 
   const wasamaInfo = [
     wasamaName && `${wasamaName}`,
@@ -99,9 +100,11 @@ export default function ResidentDashboard() {
           Welcome, {welcomeName}!
         </h1>
         {wasamaInfo && (
-          <p className="text-muted-foreground">{wasamaInfo}</p>
+          <p className="text-muted-foreground">
+            {wasamaInfo} {!isVerified && `• ${t("wasamaInfo")}`}
+          </p>
         )}
-        {!wasamaInfo && (
+        {!wasamaInfo && !isVerified && (
           <p className="text-muted-foreground">{t("wasamaInfo")}</p>
         )}
       </div>

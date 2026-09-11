@@ -16,6 +16,7 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ 
       where: isEmail ? { email: identifier } : { nic: identifier },
       include: {
+        wasama: true,
         residentProfile: {
           include: {
             household: {
@@ -36,7 +37,7 @@ export class AuthService {
 
   async login(user: any) {
     let wasamaId = user.wasamaId;
-    let wasamaName = null;
+    let wasamaName = user.wasama?.name || null;
     let householdNo = null;
 
     if (user.role === 'RESIDENT' && user.residentProfile?.household) {
@@ -55,6 +56,7 @@ export class AuthService {
       householdNo: householdNo,
       pradeshiyaSabhaId: user.pradeshiyaSabhaId,
       residentId: user.residentId,
+      isVerified: user.residentProfile?.isVerified || false,
     };
     return {
       access_token: this.jwtService.sign(payload),
@@ -138,6 +140,7 @@ export class AuthService {
           passwordHash,
           role: 'RESIDENT',
           residentId: resident.id,
+          wasamaId: wasama.id,
         },
       });
 
