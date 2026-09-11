@@ -72,6 +72,9 @@ export class AuthService {
     if (!dto.consentGiven) {
       throw new BadRequestException('PDPA consent is required');
     }
+    if (!dto.householdNo) {
+      throw new BadRequestException('Household number is required');
+    }
 
     const existingUser = await this.prisma.user.findUnique({
       where: { nic: dto.nic },

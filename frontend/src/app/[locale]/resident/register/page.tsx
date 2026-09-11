@@ -314,7 +314,7 @@ export default function ResidentRegistration() {
                   </div>
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="householdNo">{t("householdNumber")}</Label>
-                    <Input id="householdNo" value={householdNo} onChange={(e) => setHouseholdNo(e.target.value)} placeholder={t("ifKnown")} className="dark:bg-slate-800 dark:border-slate-700" />
+                    <Input id="householdNo" value={householdNo} onChange={(e) => setHouseholdNo(e.target.value)} placeholder={t("ifKnown")} required className="dark:bg-slate-800 dark:border-slate-700" />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="address">{t("permanentAddress")}</Label>
