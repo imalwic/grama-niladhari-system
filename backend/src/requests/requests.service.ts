@@ -64,11 +64,21 @@ export class RequestsService {
     });
   }
 
+  async findByToken(token: string) {
+    return this.prisma.request.findUnique({
+      where: { qrCodeToken: token },
+      include: {
+        resident: {
+          select: { fullName: true, nic: true }
+        }
+      }
+    });
+  }
+
   async updateStatus(id: string, status: any, gnOfficerId: string, notes?: string) {
     let certificateUrl = null;
     let qrCodeToken = null;
 
-    // Simulate PDF Generation logic
     if (status === 'APPROVED') {
       certificateUrl = `/certificates/certificate-${id}.pdf`;
       qrCodeToken = `CERT-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;

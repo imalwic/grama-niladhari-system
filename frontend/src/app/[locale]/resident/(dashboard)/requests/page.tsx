@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Download, Eye, FileText, Search, UploadCloud } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Tesseract from 'tesseract.js';
 
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
@@ -30,6 +31,42 @@ export default function ResidentRequests() {
   const [requestType, setRequestType] = useState("");
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  
+  // OCR State
+  const [ocrText, setOcrText] = useState("");
+  const [isOcrProcessing, setIsOcrProcessing] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // We only process images for OCR (PDFs require pdf.js first)
+    if (file.type.startsWith('image/')) {
+      setIsOcrProcessing(true);
+      setOcrText("");
+      try {
+        const result = await Tesseract.recognize(file, 'eng', {
+          logger: m => console.log(m)
+        });
+        
+        const text = result.data.text;
+        // Regex to find Old NIC (9 digits + V/X) or New NIC (12 digits)
+        const nicRegex = /\b\d{9}[vVxX]|\d{12}\b/g;
+        const foundNics = text.match(nicRegex);
+        
+        if (foundNics) {
+          setOcrText(`NIC detected: ${foundNics[0].toUpperCase()}`);
+        } else {
+          setOcrText("Processed successfully but no NIC detected.");
+        }
+      } catch (err) {
+        console.error("OCR failed", err);
+        setOcrText("Failed to process image.");
+      } finally {
+        setIsOcrProcessing(false);
+      }
+    }
+  };
 
   const fetchRequests = async () => {
     try {
@@ -133,13 +170,24 @@ export default function ResidentRequests() {
                 </div>
                 <div className="space-y-2">
                   <Label>{t("supportingDocs")}</Label>
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 border-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-800">
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 border-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-800 relative">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <UploadCloud className="w-8 h-8 mb-2 text-slate-400" />
                       <p className="text-xs text-slate-500">{t("fileFormats")}</p>
                     </div>
-                    <input type="file" className="hidden" accept=".pdf, .jpg, .png" />
+                    <input type="file" className="hidden" accept=".pdf, .jpg, .png" onChange={handleFileUpload} />
+                    {isOcrProcessing && (
+                      <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 flex items-center justify-center rounded-lg">
+                        <span className="text-sm font-medium animate-pulse text-blue-600">Scanning Document with AI...</span>
+                      </div>
+                    )}
                   </label>
+                  {ocrText && (
+                     <div className="text-xs p-2 mt-2 bg-blue-50 text-blue-700 rounded border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">
+                       <span className="font-semibold">AI Verification: </span>
+                       {ocrText}
+                     </div>
+                  )}
                 </div>
               </div>
               <DialogFooter>

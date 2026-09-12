@@ -78,7 +78,7 @@ export class PdfService {
 
         // Generate QR Code
         if (request.qrCodeToken) {
-           const qrCodeDataUrl = await QRCode.toDataURL(`https://verify.gov.lk/cert/${request.qrCodeToken}`, { errorCorrectionLevel: 'H' });
+           const qrCodeDataUrl = await QRCode.toDataURL(`http://localhost:3000/en/verify/${request.qrCodeToken}`, { errorCorrectionLevel: 'H' });
            const base64Data = qrCodeDataUrl.replace(/^data:image\/png;base64,/, "");
            const imgBuffer = Buffer.from(base64Data, 'base64');
            

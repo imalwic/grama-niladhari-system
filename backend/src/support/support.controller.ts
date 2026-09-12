@@ -8,12 +8,12 @@ export class SupportController {
   constructor(private readonly supportService: SupportService) {}
 
   @Post()
-  createTicket(@Request() req, @Body() body: { subject: string; message: string }) {
-    return this.supportService.createTicket(req.user.userId, body.subject, body.message);
+  createTicket(@Request() req: any, @Body() body: { subject: string; message: string }) {
+    return this.supportService.createTicket(req.user.sub, body.subject, body.message);
   }
 
   @Get()
-  getUserTickets(@Request() req) {
+  getUserTickets(@Request() req: any) {
     return this.supportService.getUserTickets(req.user.userId);
   }
 }
