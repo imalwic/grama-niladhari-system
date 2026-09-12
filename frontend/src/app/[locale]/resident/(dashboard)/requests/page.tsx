@@ -30,16 +30,42 @@ export default function ResidentRequests() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [requestType, setRequestType] = useState("");
   const [reason, setReason] = useState("");
+  const [otherDetails, setOtherDetails] = useState("");
   const [submitting, setSubmitting] = useState(false);
   
   // OCR State
   const [ocrText, setOcrText] = useState("");
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
+  const [isDocumentVerified, setIsDocumentVerified] = useState(false);
+
+  // Reset form when dialog opens/closes
+  useEffect(() => {
+    if (!isDialogOpen) {
+      setRequestType("");
+      setReason("");
+      setOtherDetails("");
+      setOcrText("");
+      setIsDocumentVerified(false);
+    }
+  }, [isDialogOpen]);
+
+  const getUserNic = () => {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.nic;
+    } catch (e) {
+      return null;
+    }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
+    setIsDocumentVerified(false); // Reset verification
+
     // We only process images for OCR (PDFs require pdf.js first)
     if (file.type.startsWith('image/')) {
       setIsOcrProcessing(true);
@@ -50,21 +76,55 @@ export default function ResidentRequests() {
         });
         
         const text = result.data.text;
+        const textLower = text.toLowerCase();
+        
+        // Keywords to ensure it's a real document (not just a handwritten note)
+        const validKeywords = [
+          "identity", "national", "sri lanka", "driving", "licence", "license", 
+          "passport", "republic", "date of birth", "dob", "department", "issued", "name", "sex", "date of issue", "blood group", "m/f"
+        ];
+        
+        // Check if at least one official document keyword exists in the OCR text
+        const hasValidKeyword = validKeywords.some(keyword => textLower.includes(keyword));
+
         // Regex to find Old NIC (9 digits + V/X) or New NIC (12 digits)
         const nicRegex = /\b\d{9}[vVxX]|\d{12}\b/g;
         const foundNics = text.match(nicRegex);
         
         if (foundNics) {
-          setOcrText(`NIC detected: ${foundNics[0].toUpperCase()}`);
+          const extractedNic = foundNics[0].toUpperCase();
+          const userNic = getUserNic()?.toUpperCase();
+          
+          if (userNic && extractedNic === userNic) {
+             if (hasValidKeyword) {
+               setOcrText(`NIC detected: ${extractedNic} - ✅ Identity Verified!`);
+               setIsDocumentVerified(true);
+             } else {
+               setOcrText(`❌ Valid NIC found, but this does not look like an official document. Please upload a clear photo of the actual ID card.`);
+               e.target.value = ''; // Reject file
+             }
+          } else {
+             setOcrText(`NIC detected: ${extractedNic} - ❌ Does not match your account`);
+             e.target.value = ''; // Reject file
+          }
         } else {
           setOcrText("Processed successfully but no NIC detected.");
+          e.target.value = ''; // Reject file
         }
       } catch (err) {
         console.error("OCR failed", err);
         setOcrText("Failed to process image.");
+        e.target.value = ''; // Reject file
       } finally {
         setIsOcrProcessing(false);
       }
+    } else if (file.type === 'application/pdf') {
+      // PDF handling
+      setOcrText(`📄 PDF attached: ${file.name} (Auto-verification is only available for images, so we cannot verify your identity)`);
+      e.target.value = ''; // Reject file because we MUST verify
+    } else {
+      setOcrText("❌ Unsupported file format. Please upload JPG or PNG.");
+      e.target.value = ''; // Reject file
     }
   };
 
@@ -97,19 +157,20 @@ export default function ResidentRequests() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!requestType || !reason) return;
+    if (!requestType || !reason || !isDocumentVerified) return;
     
     setSubmitting(true);
     try {
+      // Combine reason and otherDetails
+      const finalReason = otherDetails ? `${reason}\n\nOther Details:\n${otherDetails}` : reason;
+
       const res = await fetch("http://localhost:3001/requests", {
         method: "POST",
         headers: getAuthHeaders(),
-        body: JSON.stringify({ requestType, reason }),
+        body: JSON.stringify({ requestType, reason: finalReason }),
       });
       if (res.ok) {
         setIsDialogOpen(false);
-        setRequestType("");
-        setReason("");
         await fetchRequests(); // Refresh list
       }
     } catch (err) {
@@ -169,13 +230,17 @@ export default function ResidentRequests() {
                   <Textarea id="reason" required value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("purposePlaceholder")} className="dark:bg-slate-800 dark:border-slate-700" />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("supportingDocs")}</Label>
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 border-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-800 relative">
+                  <Label htmlFor="otherDetails">Other Details (Optional)</Label>
+                  <Textarea id="otherDetails" value={otherDetails} onChange={(e) => setOtherDetails(e.target.value)} placeholder="Any other details..." className="dark:bg-slate-800 dark:border-slate-700" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Upload NIC, Driving License or Passport (Required)</Label>
+                  <label htmlFor="document-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 border-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-800 relative">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <UploadCloud className="w-8 h-8 mb-2 text-slate-400" />
-                      <p className="text-xs text-slate-500">{t("fileFormats")}</p>
+                      <p className="text-xs text-slate-500 font-medium text-center px-4">JPG or PNG (MAX. 5MB)<br/>Identity Document Required</p>
                     </div>
-                    <input type="file" className="hidden" accept=".pdf, .jpg, .png" onChange={handleFileUpload} />
+                    <input id="document-upload" type="file" className="hidden" accept=".jpg, .png" onChange={handleFileUpload} />
                     {isOcrProcessing && (
                       <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 flex items-center justify-center rounded-lg">
                         <span className="text-sm font-medium animate-pulse text-blue-600">Scanning Document with AI...</span>
@@ -183,7 +248,7 @@ export default function ResidentRequests() {
                     )}
                   </label>
                   {ocrText && (
-                     <div className="text-xs p-2 mt-2 bg-blue-50 text-blue-700 rounded border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">
+                     <div className={`text-xs p-2 mt-2 rounded border ${isDocumentVerified ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800' : 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800'}`}>
                        <span className="font-semibold">AI Verification: </span>
                        {ocrText}
                      </div>
@@ -191,7 +256,7 @@ export default function ResidentRequests() {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={submitting} className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700 w-full text-white">
+                <Button type="submit" disabled={submitting || !isDocumentVerified} className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700 w-full text-white">
                   {submitting ? "Submitting..." : t("submitRequest")}
                 </Button>
               </DialogFooter>
