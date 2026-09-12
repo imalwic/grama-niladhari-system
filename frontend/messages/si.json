@@ -236,7 +236,8 @@
     "publishedBy": "ප්‍රකාශිතයි",
     "urgent": "හදිසි",
     "development": "සංවර්ධන",
-    "general": "සාමාන්‍ය"
+    "general": "සාමාන්‍ය",
+    "certificateType": "සහතික වර්ගය"
   },
   "Registration": {
     "title": "පදිංචිකරු ලියාපදිංචිය",

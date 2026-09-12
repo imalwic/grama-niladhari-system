@@ -236,7 +236,8 @@
     "publishedBy": "Published by",
     "urgent": "Urgent",
     "development": "Development",
-    "general": "General"
+    "general": "General",
+    "certificateType": "Certificate Type"
   },
   "Registration": {
     "title": "Resident Registration",

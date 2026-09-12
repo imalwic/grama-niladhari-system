@@ -236,7 +236,8 @@
     "publishedBy": "வெளியிட்டவர்",
     "urgent": "அவசரம்",
     "development": "அபிவிருத்தி",
-    "general": "பொது"
+    "general": "பொது",
+    "certificateType": "சான்றிதழ் வகை"
   },
   "Registration": {
     "title": "குடியிருப்பாளர் பதிவு",
