@@ -6,9 +6,12 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async getGnOfficers() {
+  async getGnOfficers(pradeshiyaSabhaId: string) {
     return this.prisma.user.findMany({
-      where: { role: 'GN_OFFICER' },
+      where: { 
+        role: 'GN_OFFICER',
+        wasama: { pradeshiyaSabhaId }
+      },
       include: {
         wasama: true
       },
@@ -16,20 +19,20 @@ export class UsersService {
     });
   }
 
-  async createGnOfficer(data: any) {
+  async createGnOfficer(data: any, pradeshiyaSabhaId: string) {
     const { name, nic, email, wasamaCode, password } = data;
 
-    // Optional: Find Wasama by code/name
+    // WasamaCode is coming from frontend Select which passes wasama.name
+    // Let's find the Wasama in this Pradeshiya Sabha
     let wasama = await this.prisma.wasama.findFirst({
-      where: { name: wasamaCode }
+      where: { 
+        OR: [{ name: wasamaCode }, { code: wasamaCode }],
+        pradeshiyaSabhaId
+      }
     });
     
-    // Fallback: If not found, try by code or just take the first one or create dummy
     if (!wasama) {
-       wasama = await this.prisma.wasama.findFirst();
-       if (!wasama) {
-          throw new BadRequestException('No Wasama found in the system. Please create a Wasama first.');
-       }
+       throw new BadRequestException('Invalid Wasama or it does not belong to your Pradeshiya Sabha.');
     }
 
     const existingUser = await this.prisma.user.findFirst({
@@ -55,10 +58,17 @@ export class UsersService {
     });
   }
 
-  async deleteGnOfficer(id: string) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+  async deleteGnOfficer(id: string, pradeshiyaSabhaId: string) {
+    const user = await this.prisma.user.findUnique({ 
+      where: { id },
+      include: { wasama: true }
+    });
     if (!user || user.role !== 'GN_OFFICER') {
       throw new NotFoundException('GN Officer not found');
+    }
+    
+    if (user.wasama?.pradeshiyaSabhaId !== pradeshiyaSabhaId) {
+      throw new BadRequestException('Cannot delete GN officer from another Pradeshiya Sabha');
     }
 
     return this.prisma.user.delete({ where: { id } });

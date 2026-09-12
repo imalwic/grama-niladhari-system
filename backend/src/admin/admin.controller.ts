@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -12,7 +12,7 @@ export class AdminController {
 
   @Get('dashboard-stats')
   @Roles(Role.SUPER_ADMIN)
-  async getDashboardStats() {
-    return this.adminService.getDashboardStats();
+  async getDashboardStats(@Request() req: any) {
+    return this.adminService.getDashboardStats(req.user.pradeshiyaSabhaId);
   }
 }

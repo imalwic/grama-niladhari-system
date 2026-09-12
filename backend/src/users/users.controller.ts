@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -12,19 +12,22 @@ export class UsersController {
 
   @Get('gn-officers')
   @Roles(Role.SUPER_ADMIN)
-  getGnOfficers() {
-    return this.usersService.getGnOfficers();
+  getGnOfficers(@Request() req: any) {
+    if (!req.user.pradeshiyaSabhaId) throw new UnauthorizedException('Super admin is not assigned to a Pradeshiya Sabha');
+    return this.usersService.getGnOfficers(req.user.pradeshiyaSabhaId);
   }
 
   @Post('gn-officers')
   @Roles(Role.SUPER_ADMIN)
-  createGnOfficer(@Body() data: any) {
-    return this.usersService.createGnOfficer(data);
+  createGnOfficer(@Body() data: any, @Request() req: any) {
+    if (!req.user.pradeshiyaSabhaId) throw new UnauthorizedException('Super admin is not assigned to a Pradeshiya Sabha');
+    return this.usersService.createGnOfficer(data, req.user.pradeshiyaSabhaId);
   }
 
   @Delete('gn-officers/:id')
   @Roles(Role.SUPER_ADMIN)
-  deleteGnOfficer(@Param('id') id: string) {
-    return this.usersService.deleteGnOfficer(id);
+  deleteGnOfficer(@Param('id') id: string, @Request() req: any) {
+    if (!req.user.pradeshiyaSabhaId) throw new UnauthorizedException('Super admin is not assigned to a Pradeshiya Sabha');
+    return this.usersService.deleteGnOfficer(id, req.user.pradeshiyaSabhaId);
   }
 }

@@ -5,13 +5,26 @@ import { PrismaService } from '../prisma/prisma.service';
 export class AdminService {
   constructor(private prisma: PrismaService) {}
 
-  async getDashboardStats() {
+  async getDashboardStats(pradeshiyaSabhaId: string) {
+    if (!pradeshiyaSabhaId) {
+       return { totalResidents: 0, totalHouseholds: 0, gnDivisions: 0, pendingRequests: 0, recentActivity: [] };
+    }
+
     const [totalResidents, totalHouseholds, gnDivisions, pendingRequests, recentActivityRaw] = await Promise.all([
-      this.prisma.resident.count(),
-      this.prisma.household.count(),
-      this.prisma.wasama.count(),
-      this.prisma.request.count({ where: { status: 'PENDING' } }),
+      this.prisma.resident.count({
+        where: { household: { wasama: { pradeshiyaSabhaId } } }
+      }),
+      this.prisma.household.count({
+        where: { wasama: { pradeshiyaSabhaId } }
+      }),
+      this.prisma.wasama.count({
+        where: { pradeshiyaSabhaId }
+      }),
+      this.prisma.request.count({ 
+        where: { status: 'PENDING', resident: { household: { wasama: { pradeshiyaSabhaId } } } } 
+      }),
       this.prisma.resident.findMany({
+        where: { household: { wasama: { pradeshiyaSabhaId } } },
         orderBy: { createdAt: 'desc' },
         take: 5,
         include: { household: { include: { wasama: true } } }
