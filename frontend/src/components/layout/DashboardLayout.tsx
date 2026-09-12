@@ -51,7 +51,6 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
   const superAdminNav: SidebarItem[] = [
     { name: nav("overview"), href: "/super-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("gnOfficers"), href: "/super-admin/gn-officers", icon: <Users className="h-5 w-5" /> },
-    { name: nav("settings"), href: "/super-admin/settings", icon: <Settings className="h-5 w-5" /> },
   ];
 
   const gnOfficerNav: SidebarItem[] = [
@@ -60,7 +59,6 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("residents"), href: "/gn-officer/residents", icon: <Users className="h-5 w-5" /> },
     { name: nav("requests"), href: "/gn-officer/requests", icon: <FileText className="h-5 w-5" /> },
     { name: nav("notices"), href: "/gn-officer/notices", icon: <Bell className="h-5 w-5" /> },
-    { name: nav("settings"), href: "/gn-officer/settings", icon: <Settings className="h-5 w-5" /> },
   ];
 
   const residentNav: SidebarItem[] = [
@@ -73,6 +71,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
   const navigation = role === "SUPER_ADMIN" ? superAdminNav : role === "GN_OFFICER" ? gnOfficerNav : residentNav;
 
   const roleLabel = role === "SUPER_ADMIN" ? common("pradeshiyaSabhaAdmin") : role === "GN_OFFICER" ? common("gramaNiladhari") : common("resident");
+  const settingsHref = role === "SUPER_ADMIN" ? "/super-admin/settings" : role === "GN_OFFICER" ? "/gn-officer/settings" : "/resident/settings";
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-slate-50 dark:bg-slate-950 transition-colors">
@@ -147,8 +146,10 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                 <DropdownMenuGroup>
                   <DropdownMenuLabel className="dark:text-slate-200">{common("myAccount")}</DropdownMenuLabel>
                   <DropdownMenuSeparator className="dark:bg-slate-800" />
-                  <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{nav("settings")}</DropdownMenuItem>
-                  <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{common("support")}</DropdownMenuItem>
+                  <DropdownMenuItem asChild className="dark:text-slate-300 dark:focus:bg-slate-800 cursor-pointer">
+                    <Link href={settingsHref}>{nav("settings")}</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800 cursor-pointer">{common("support")}</DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
