@@ -96,11 +96,11 @@ export default function SupportPage() {
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
+          <DialogTrigger render={
             <Button className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
               <Plus className="mr-2 h-4 w-4" /> New Ticket
             </Button>
-          </DialogTrigger>
+          } />
           <DialogContent className="sm:max-w-[425px] dark:bg-slate-900 dark:border-slate-800">
             <form onSubmit={handleSubmit}>
               <DialogHeader>
