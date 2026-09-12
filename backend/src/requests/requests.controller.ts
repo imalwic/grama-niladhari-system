@@ -60,4 +60,23 @@ export class RequestsController {
     
     res.end(pdfBuffer);
   }
+
+  @Get(':id/application')
+  @Roles(Role.GN_OFFICER, Role.RESIDENT)
+  async getApplicationPdf(@Param('id') id: string, @Res() res: Response) {
+    const request = await this.requestsService.findByIdWithDetails(id);
+    if (!request) {
+      throw new NotFoundException('Request not found');
+    }
+    
+    const pdfBuffer = await this.pdfService.generateApplicationPdf(request);
+    
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `inline; filename="application-${id}.pdf"`,
+      'Content-Length': pdfBuffer.length,
+    });
+    
+    res.end(pdfBuffer);
+  }
 }

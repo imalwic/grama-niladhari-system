@@ -1,11 +1,41 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Home, MapPin, Activity } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function SuperAdminDashboard() {
   const t = useTranslations("SuperAdmin");
+  
+  const [stats, setStats] = useState<any>({
+    totalResidents: 0,
+    totalHouseholds: 0,
+    gnDivisions: 0,
+    pendingRequests: 0,
+    recentActivity: []
+  });
+  
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:3001/admin/dashboard-stats", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch dashboard stats", err);
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -22,7 +52,7 @@ export default function SuperAdminDashboard() {
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">14,231</div>
+            <div className="text-2xl font-bold">{stats.totalResidents.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">{t("fromLastMonth")}</p>
           </CardContent>
         </Card>
@@ -32,7 +62,7 @@ export default function SuperAdminDashboard() {
             <Home className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4,102</div>
+            <div className="text-2xl font-bold">{stats.totalHouseholds.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">{t("newRegistrations")}</p>
           </CardContent>
         </Card>
@@ -42,7 +72,7 @@ export default function SuperAdminDashboard() {
             <MapPin className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{stats.gnDivisions}</div>
             <p className="text-xs text-muted-foreground">{t("allAssigned")}</p>
           </CardContent>
         </Card>
@@ -52,7 +82,7 @@ export default function SuperAdminDashboard() {
             <Activity className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">128</div>
+            <div className="text-2xl font-bold">{stats.pendingRequests}</div>
             <p className="text-xs text-muted-foreground">{t("acrossDivisions")}</p>
           </CardContent>
         </Card>
@@ -71,7 +101,7 @@ export default function SuperAdminDashboard() {
             <p className="text-muted-foreground italic">{t("chartPlaceholder")}</p>
           </CardContent>
         </Card>
-        <Card className="col-span-3 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+        <Card className="col-span-3 shadow-sm dark:bg-slate-900 dark:border-slate-800 overflow-y-auto max-h-[400px]">
           <CardHeader>
             <CardTitle>{t("recentActivity")}</CardTitle>
             <CardDescription>
@@ -79,19 +109,22 @@ export default function SuperAdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-8">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center">
+            <div className="space-y-6">
+              {stats.recentActivity.map((activity: any, index: number) => (
+                <div key={index} className="flex items-center">
                   <div className="space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {t("residentRegistered")}
+                      {activity.message}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      {t("byOfficer")}
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(activity.time).toLocaleString()}
                     </p>
                   </div>
                 </div>
               ))}
+              {stats.recentActivity.length === 0 && (
+                <p className="text-sm text-muted-foreground">No recent activity found.</p>
+              )}
             </div>
           </CardContent>
         </Card>

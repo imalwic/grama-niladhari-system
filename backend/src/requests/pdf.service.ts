@@ -95,4 +95,87 @@ export class PdfService {
       }
     });
   }
+
+  async generateApplicationPdf(request: any): Promise<Buffer> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const doc = new PDFDocument({ margin: 50, size: 'A4' });
+        const buffers: Buffer[] = [];
+
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+          const pdfData = Buffer.concat(buffers);
+          resolve(pdfData);
+        });
+
+        // Add a nice border
+        doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).stroke();
+
+        // Header
+        doc
+          .fontSize(16)
+          .font('Helvetica-Bold')
+          .text('APPLICATION SUMMARY FOR GRAMA NILADHARI', { align: 'center' });
+        
+        doc.moveDown(0.2);
+        
+        doc
+          .fontSize(12)
+          .font('Helvetica')
+          .fillColor('gray')
+          .text('Internal Review Document', { align: 'center' });
+
+        doc.moveDown(2);
+
+        // Application Details
+        doc.fontSize(12).font('Helvetica-Bold');
+        doc.fillColor('black').text('Application Details:', { underline: true });
+        doc.moveDown(0.5);
+        doc.font('Helvetica');
+        doc.text(`Request ID: ${request.id}`);
+        doc.text(`Request Type: ${request.requestType}`);
+        doc.text(`Submitted Date: ${new Date(request.createdAt).toLocaleString()}`);
+        doc.text(`Current Status: ${request.status}`);
+
+        doc.moveDown(1.5);
+
+        // Resident Details
+        doc.font('Helvetica-Bold').text('Applicant (Resident) Details:', { underline: true });
+        doc.moveDown(0.5);
+        doc.font('Helvetica');
+        doc.text(`Full Name: ${request.resident?.fullName || 'N/A'}`);
+        doc.text(`NIC Number: ${request.resident?.nic || 'N/A'}`);
+        doc.text(`Phone Number: ${request.resident?.phone || 'N/A'}`);
+        if (request.resident?.household) {
+           doc.text(`Address: ${request.resident.household.address}`);
+           doc.text(`Household No: ${request.resident.household.houseNumber}`);
+        }
+
+        doc.moveDown(1.5);
+
+        // Content
+        doc.font('Helvetica-Bold').text('Request Purpose & Details:', { underline: true });
+        doc.moveDown(0.5);
+        doc.font('Helvetica');
+        
+        // Handle multiline reason/details nicely
+        const reasonText = request.reason || 'No details provided';
+        doc.text(reasonText, { align: 'left', width: 450 });
+
+        doc.moveDown(3);
+
+        // Footer / Office Use section
+        doc.rect(50, doc.y, 495, 100).stroke();
+        doc.font('Helvetica-Bold').text('For Office Use Only', 60, doc.y + 10);
+        doc.font('Helvetica').text('Reviewed By: .......................................', 60, doc.y + 30);
+        doc.text('Date: .......................', 300, doc.y - 14);
+        doc.text('Decision:  [  ] Approved    [  ] Rejected', 60, doc.y + 20);
+        doc.text('Remarks: ........................................................................', 60, doc.y + 20);
+
+        doc.end();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }
