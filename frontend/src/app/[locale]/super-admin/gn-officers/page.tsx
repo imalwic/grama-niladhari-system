@@ -7,11 +7,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Search, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function GnManagement() {
   const [officers, setOfficers] = useState<any[]>([]);
+  const [wasamas, setWasamas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -30,24 +38,32 @@ export default function GnManagement() {
     };
   };
 
-  const fetchOfficers = async () => {
+  const fetchOfficersAndWasamas = async () => {
     try {
-      const res = await fetch("http://localhost:3001/users/gn-officers", {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const headers = getAuthHeaders();
+      const [officersRes, wasamasRes] = await Promise.all([
+        fetch("http://localhost:3001/users/gn-officers", { headers }),
+        fetch("http://localhost:3001/wasamas", { headers })
+      ]);
+      
+      if (officersRes.ok) {
+        const data = await officersRes.json();
         setOfficers(data);
       }
+      
+      if (wasamasRes.ok) {
+        const wData = await wasamasRes.json();
+        setWasamas(wData);
+      }
     } catch (err) {
-      console.error("Failed to fetch officers", err);
+      console.error("Failed to fetch data", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOfficers();
+    fetchOfficersAndWasamas();
   }, []);
 
   const filteredOfficers = officers.filter((officer) =>
@@ -73,7 +89,7 @@ export default function GnManagement() {
       if (res.ok) {
         setIsDialogOpen(false);
         setFormData({ name: "", nic: "", division: "", email: "" });
-        await fetchOfficers();
+        await fetchOfficersAndWasamas();
       } else {
         const errorData = await res.json();
         setError(errorData.message || "Failed to add GN Officer");
@@ -93,7 +109,7 @@ export default function GnManagement() {
         headers: getAuthHeaders(),
       });
       if (res.ok) {
-        await fetchOfficers();
+        await fetchOfficersAndWasamas();
       }
     } catch (err) {
       console.error("Failed to delete officer", err);
@@ -133,7 +149,23 @@ export default function GnManagement() {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="division" className="text-right">{t("wasama")}</Label>
-                  <Input id="division" required value={formData.division} onChange={e => setFormData({...formData, division: e.target.value})} className="col-span-3" placeholder="e.g. Weeraketiya North" />
+                  <div className="col-span-3">
+                    <Select value={formData.division} onValueChange={(val) => setFormData({...formData, division: val || ""})}>
+                      <SelectTrigger id="division">
+                        <SelectValue placeholder="Select a Wasama" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {wasamas.map((w: any) => (
+                          <SelectItem key={w.id} value={w.name}>
+                            {w.name} ({w.code})
+                          </SelectItem>
+                        ))}
+                        {wasamas.length === 0 && (
+                          <SelectItem value="none" disabled>No Wasamas found</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="email" className="text-right">{t("email")}</Label>
