@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,22 +12,75 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, Download, Eye, FileText, Search, UploadCloud } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-const MOCK_REQUESTS = [
-  { id: "REQ-001", type: "Income Certificate", status: "PENDING", submittedDate: "2023-10-25", certificateUrl: null },
-  { id: "REQ-002", type: "Character Certificate", status: "APPROVED", submittedDate: "2023-10-15", certificateUrl: "/cert-002.pdf" },
-  { id: "REQ-003", type: "Residence Confirmation", status: "REJECTED", submittedDate: "2023-10-10", certificateUrl: null, reviewNotes: "Missing supporting documents." },
-];
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`,
+  };
+}
 
 export default function ResidentRequests() {
-  const [requests, setRequests] = useState(MOCK_REQUESTS);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Form State
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [requestType, setRequestType] = useState("");
+  const [reason, setReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchRequests = async () => {
+    try {
+      const res = await fetch("http://localhost:3001/requests/resident", {
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRequests(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch requests", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
   const t = useTranslations("Resident");
   const c = useTranslations("Common");
 
   const filteredRequests = requests.filter(r => 
-    r.type.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    r.id.toLowerCase().includes(searchTerm.toLowerCase())
+    r.requestType?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    r.id?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!requestType || !reason) return;
+    
+    setSubmitting(true);
+    try {
+      const res = await fetch("http://localhost:3001/requests", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ requestType, reason }),
+      });
+      if (res.ok) {
+        setIsDialogOpen(false);
+        setRequestType("");
+        setReason("");
+        await fetchRequests(); // Refresh list
+      }
+    } catch (err) {
+      console.error("Failed to submit request", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch(status) {
@@ -46,51 +99,55 @@ export default function ResidentRequests() {
           <p className="text-muted-foreground">{t("requestAndTrack")}</p>
         </div>
 
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger render={
             <Button className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
               <Plus className="mr-2 h-4 w-4" /> {t("requestCertificate")}
             </Button>
           } />
           <DialogContent className="sm:max-w-[425px] dark:bg-slate-900 dark:border-slate-800">
-            <DialogHeader>
-              <DialogTitle>{t("newCertRequest")}</DialogTitle>
-              <DialogDescription>
-                {t("submitApplication")}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="type">{t("certificateType")}</Label>
-                <Select>
-                  <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
-                    <SelectValue placeholder={t("selectCertType")} />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                    <SelectItem value="income">{t("incomeCertificate")}</SelectItem>
-                    <SelectItem value="character">{t("characterCertificate")}</SelectItem>
-                    <SelectItem value="residence">{t("residenceConfirmation")}</SelectItem>
-                  </SelectContent>
-                </Select>
+            <form onSubmit={handleSubmit}>
+              <DialogHeader>
+                <DialogTitle>{t("newCertRequest")}</DialogTitle>
+                <DialogDescription>
+                  {t("submitApplication")}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="type">{t("certificateType")}</Label>
+                  <Select value={requestType} onValueChange={(v) => setRequestType(v || "")} required>
+                    <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
+                      <SelectValue placeholder={t("selectCertType")} />
+                    </SelectTrigger>
+                    <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                      <SelectItem value="Income Certificate">{t("incomeCertificate")}</SelectItem>
+                      <SelectItem value="Character Certificate">{t("characterCertificate")}</SelectItem>
+                      <SelectItem value="Residence Confirmation">{t("residenceConfirmation")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reason">{t("purposeReason")}</Label>
+                  <Textarea id="reason" required value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("purposePlaceholder")} className="dark:bg-slate-800 dark:border-slate-700" />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("supportingDocs")}</Label>
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 border-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-800">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <UploadCloud className="w-8 h-8 mb-2 text-slate-400" />
+                      <p className="text-xs text-slate-500">{t("fileFormats")}</p>
+                    </div>
+                    <input type="file" className="hidden" accept=".pdf, .jpg, .png" />
+                  </label>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="reason">{t("purposeReason")}</Label>
-                <Textarea id="reason" placeholder={t("purposePlaceholder")} className="dark:bg-slate-800 dark:border-slate-700" />
-              </div>
-              <div className="space-y-2">
-                <Label>{t("supportingDocs")}</Label>
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 border-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-800">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <UploadCloud className="w-8 h-8 mb-2 text-slate-400" />
-                    <p className="text-xs text-slate-500">{t("fileFormats")}</p>
-                  </div>
-                  <input type="file" className="hidden" accept=".pdf, .jpg, .png" />
-                </label>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit" className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700 w-full text-white">{t("submitRequest")}</Button>
-            </DialogFooter>
+              <DialogFooter>
+                <Button type="submit" disabled={submitting} className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700 w-full text-white">
+                  {submitting ? "Submitting..." : t("submitRequest")}
+                </Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
@@ -121,14 +178,14 @@ export default function ResidentRequests() {
           <TableBody>
             {filteredRequests.map((req) => (
               <TableRow key={req.id}>
-                <TableCell className="font-medium font-mono text-xs">{req.id}</TableCell>
+                <TableCell className="font-medium font-mono text-xs">{req.id.substring(0, 8).toUpperCase()}</TableCell>
                 <TableCell>
                   <div className="flex items-center">
                     <FileText className="h-4 w-4 mr-2 text-slate-400" />
-                    {req.type}
+                    {req.requestType}
                   </div>
                 </TableCell>
-                <TableCell>{req.submittedDate}</TableCell>
+                <TableCell>{new Date(req.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell>{getStatusBadge(req.status)}</TableCell>
                 <TableCell className="text-right">
                   {req.status === "APPROVED" && (
