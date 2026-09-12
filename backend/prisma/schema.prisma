@@ -85,6 +85,7 @@ model User {
   residentProfile Resident? @relation(fields: [residentId], references: [id])
 
   notifications AppNotification[]
+  supportTickets SupportTicket[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -194,4 +195,24 @@ model AppNotification {
   user   User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model SupportTicket {
+  id        String       @id @default(uuid())
+  subject   String
+  message   String
+  status    TicketStatus @default(OPEN)
+  
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }

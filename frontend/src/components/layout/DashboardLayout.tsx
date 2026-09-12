@@ -223,7 +223,11 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
-                  <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{common("support")}</DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer dark:text-slate-300 dark:focus:bg-slate-800">
+                    <Link href={role === "SUPER_ADMIN" ? "/super-admin/support" : role === "GN_OFFICER" ? "/gn-officer/support" : "/resident/support"}>
+                      {common("support")}
+                    </Link>
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>

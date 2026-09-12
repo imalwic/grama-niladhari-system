@@ -11,6 +11,7 @@ import { RequestsModule } from './requests/requests.module';
 import { CategoriesModule } from './categories/categories.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { SupportModule } from './support/support.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PrismaModule } from './prisma/prisma.module';
     CategoriesModule,
     NotificationsModule,
     PrismaModule,
+    SupportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
