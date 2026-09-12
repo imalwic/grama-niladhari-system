@@ -88,7 +88,10 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
         <div className="flex-1 overflow-auto py-4">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4 gap-1">
             {navigation.map((item) => {
-              const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+              const rootPath = role === "SUPER_ADMIN" ? "/super-admin" : role === "GN_OFFICER" ? "/gn-officer" : "/resident";
+              const isActive = item.href === rootPath 
+                ? pathname === item.href 
+                : (pathname === item.href || pathname?.startsWith(item.href + "/"));
               return (
                 <Link
                   key={item.href}

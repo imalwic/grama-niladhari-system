@@ -43,7 +43,7 @@ export default function ResidentRequests() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("myRequests")}</h1>
-          <p className="text-muted-foreground">{t("requestCertTrackStatus")}</p>
+          <p className="text-muted-foreground">{t("requestAndTrack")}</p>
         </div>
 
         <Dialog>
@@ -75,7 +75,7 @@ export default function ResidentRequests() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="reason">{t("purposeReason")}</Label>
-                <Textarea id="reason" placeholder={t("reasonPlaceholder")} className="dark:bg-slate-800 dark:border-slate-700" />
+                <Textarea id="reason" placeholder={t("purposePlaceholder")} className="dark:bg-slate-800 dark:border-slate-700" />
               </div>
               <div className="space-y-2">
                 <Label>{t("supportingDocs")}</Label>
