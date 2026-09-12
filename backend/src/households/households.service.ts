@@ -81,4 +81,24 @@ export class HouseholdsService {
       where: { id },
     });
   }
+
+  async findMyHousehold(residentId: string) {
+    const resident = await this.prisma.resident.findUnique({
+      where: { id: residentId },
+      include: {
+        household: {
+          include: {
+            wasama: true,
+            residents: true,
+          }
+        }
+      }
+    });
+
+    if (!resident || !resident.household) {
+      throw new NotFoundException('Household not found');
+    }
+
+    return resident.household;
+  }
 }

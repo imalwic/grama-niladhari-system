@@ -2,8 +2,9 @@
 
 import React from "react";
 import Image from "next/image";
-import { Link, usePathname } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
+import { useTranslations, useLocale } from "next-intl";
+import { useState, useEffect } from "react";
 import { 
   LayoutDashboard, 
   Users, 
@@ -12,7 +13,10 @@ import {
   LogOut,
   Bell,
   Menu,
-  FileText
+  FileText,
+  Moon,
+  Type,
+  Globe
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -24,6 +28,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
 
 interface SidebarItem {
@@ -40,8 +48,43 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, role, user }: DashboardLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const nav = useTranslations("Navigation");
   const common = useTranslations("Common");
+  const tSettings = useTranslations("Settings");
+  const currentLocale = useLocale();
+
+  const [darkMode, setDarkMode] = useState(false);
+  const [largeText, setLargeText] = useState(false);
+
+  useEffect(() => {
+    const storedDark = localStorage.getItem("dark-mode") === "true";
+    const storedText = localStorage.getItem("large-text") === "true";
+    
+    setDarkMode(storedDark);
+    setLargeText(storedText);
+    
+    if (storedDark) document.documentElement.classList.add("dark");
+    if (storedText) document.documentElement.classList.add("large-text");
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newValue = !darkMode;
+    setDarkMode(newValue);
+    localStorage.setItem("dark-mode", String(newValue));
+    document.documentElement.classList.toggle("dark", newValue);
+  };
+
+  const toggleLargeText = () => {
+    const newValue = !largeText;
+    setLargeText(newValue);
+    localStorage.setItem("large-text", String(newValue));
+    document.documentElement.classList.toggle("large-text", newValue);
+  };
+
+  const changeLanguage = (newLocale: string) => {
+    router.replace(pathname, { locale: newLocale });
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -51,6 +94,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
   const superAdminNav: SidebarItem[] = [
     { name: nav("overview"), href: "/super-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("gnOfficers"), href: "/super-admin/gn-officers", icon: <Users className="h-5 w-5" /> },
+    { name: nav("settings"), href: "/super-admin/settings", icon: <Settings className="h-5 w-5" /> },
   ];
 
   const gnOfficerNav: SidebarItem[] = [
@@ -59,6 +103,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("residents"), href: "/gn-officer/residents", icon: <Users className="h-5 w-5" /> },
     { name: nav("requests"), href: "/gn-officer/requests", icon: <FileText className="h-5 w-5" /> },
     { name: nav("notices"), href: "/gn-officer/notices", icon: <Bell className="h-5 w-5" /> },
+    { name: nav("settings"), href: "/gn-officer/settings", icon: <Settings className="h-5 w-5" /> },
   ];
 
   const residentNav: SidebarItem[] = [
@@ -71,7 +116,6 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
   const navigation = role === "SUPER_ADMIN" ? superAdminNav : role === "GN_OFFICER" ? gnOfficerNav : residentNav;
 
   const roleLabel = role === "SUPER_ADMIN" ? common("pradeshiyaSabhaAdmin") : role === "GN_OFFICER" ? common("gramaNiladhari") : common("resident");
-  const settingsHref = role === "SUPER_ADMIN" ? "/super-admin/settings" : role === "GN_OFFICER" ? "/gn-officer/settings" : "/resident/settings";
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-slate-50 dark:bg-slate-950 transition-colors">
@@ -146,10 +190,40 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                 <DropdownMenuGroup>
                   <DropdownMenuLabel className="dark:text-slate-200">{common("myAccount")}</DropdownMenuLabel>
                   <DropdownMenuSeparator className="dark:bg-slate-800" />
-                  <DropdownMenuItem asChild className="dark:text-slate-300 dark:focus:bg-slate-800 cursor-pointer">
-                    <Link href={settingsHref}>{nav("settings")}</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800 cursor-pointer">{common("support")}</DropdownMenuItem>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="dark:text-slate-300 dark:focus:bg-slate-800">
+                      <span>{nav("settings")}</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent className="w-56 dark:bg-slate-900 dark:border-slate-800">
+                        <DropdownMenuLabel className="dark:text-slate-200">{tSettings("accessibility")}</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="dark:bg-slate-800" />
+                        <DropdownMenuItem onClick={toggleDarkMode} className="cursor-pointer dark:text-slate-300 dark:focus:bg-slate-800">
+                          <Moon className="mr-2 h-4 w-4" />
+                          <span>{tSettings("darkMode")}</span>
+                          {darkMode && <span className="ml-auto text-green-600 font-bold text-xs">ON</span>}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={toggleLargeText} className="cursor-pointer dark:text-slate-300 dark:focus:bg-slate-800">
+                          <Type className="mr-2 h-4 w-4" />
+                          <span>{tSettings("largeText")}</span>
+                          {largeText && <span className="ml-auto text-green-600 font-bold text-xs">ON</span>}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="dark:bg-slate-800" />
+                        <DropdownMenuLabel className="dark:text-slate-200">{tSettings("language")}</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="dark:bg-slate-800" />
+                        <DropdownMenuItem onClick={() => changeLanguage('en')} className="cursor-pointer dark:text-slate-300 dark:focus:bg-slate-800">
+                          <span className={currentLocale === 'en' ? "font-bold text-[#003366] dark:text-blue-400" : ""}>English</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => changeLanguage('si')} className="cursor-pointer dark:text-slate-300 dark:focus:bg-slate-800">
+                          <span className={currentLocale === 'si' ? "font-bold text-[#003366] dark:text-blue-400" : ""}>සිංහල</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => changeLanguage('ta')} className="cursor-pointer dark:text-slate-300 dark:focus:bg-slate-800">
+                          <span className={currentLocale === 'ta' ? "font-bold text-[#003366] dark:text-blue-400" : ""}>தமிழ்</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                  <DropdownMenuItem className="dark:text-slate-300 dark:focus:bg-slate-800">{common("support")}</DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>

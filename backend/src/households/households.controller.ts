@@ -39,6 +39,12 @@ export class HouseholdsController {
     return this.householdsService.bulkImport(file.buffer, req.user.wasamaId);
   }
 
+  @Get('resident/my-household')
+  @Roles(Role.RESIDENT)
+  findMyHousehold(@Request() req: any) {
+    return this.householdsService.findMyHousehold(req.user.residentId);
+  }
+
   @Get()
   @Roles(Role.GN_OFFICER)
   findAll(@Request() req: any) {
