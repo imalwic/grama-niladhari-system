@@ -13,6 +13,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { SupportModule } from './support/support.module';
 import { AdminModule } from './admin/admin.module';
+import { SystemAdminModule } from './system-admin/system-admin.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AdminModule } from './admin/admin.module';
     PrismaModule,
     SupportModule,
     AdminModule,
+    SystemAdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,7 +11,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('dashboard-stats')
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.PS_ADMIN)
   async getDashboardStats(@Request() req: any) {
     return this.adminService.getDashboardStats(req.user.pradeshiyaSabhaId);
   }

@@ -42,7 +42,7 @@ interface SidebarItem {
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  role: "SUPER_ADMIN" | "GN_OFFICER" | "RESIDENT";
+  role: "SUPER_ADMIN" | "PS_ADMIN" | "GN_OFFICER" | "RESIDENT";
   user: { name: string; email: string };
 }
 
@@ -91,10 +91,16 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     window.location.href = "/";
   };
 
-  const superAdminNav: SidebarItem[] = [
-    { name: nav("overview"), href: "/super-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
-    { name: nav("gnOfficers"), href: "/super-admin/gn-officers", icon: <Users className="h-5 w-5" /> },
-    { name: nav("settings"), href: "/super-admin/settings", icon: <Settings className="h-5 w-5" /> },
+  const systemAdminNav: SidebarItem[] = [
+    { name: nav("overview"), href: "/system-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { name: nav("pradeshiyaSabhas"), href: "/system-admin/pradeshiya-sabhas", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { name: nav("psAdmins"), href: "/system-admin/ps-admins", icon: <Users className="h-5 w-5" /> },
+  ];
+
+  const psAdminNav: SidebarItem[] = [
+    { name: nav("overview"), href: "/ps-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { name: nav("gnOfficers"), href: "/ps-admin/gn-officers", icon: <Users className="h-5 w-5" /> },
+    { name: nav("settings"), href: "/ps-admin/settings", icon: <Settings className="h-5 w-5" /> },
   ];
 
   const gnOfficerNav: SidebarItem[] = [
@@ -113,9 +119,9 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("notices"), href: "/resident/notices", icon: <Bell className="h-5 w-5" /> },
   ];
 
-  const navigation = role === "SUPER_ADMIN" ? superAdminNav : role === "GN_OFFICER" ? gnOfficerNav : residentNav;
+  const navigation = role === "SUPER_ADMIN" ? systemAdminNav : role === "PS_ADMIN" ? psAdminNav : role === "GN_OFFICER" ? gnOfficerNav : residentNav;
 
-  const roleLabel = role === "SUPER_ADMIN" ? common("pradeshiyaSabhaAdmin") : role === "GN_OFFICER" ? common("gramaNiladhari") : common("resident");
+  const roleLabel = role === "SUPER_ADMIN" ? common("systemAdmin") : role === "PS_ADMIN" ? common("pradeshiyaSabhaAdmin") : role === "GN_OFFICER" ? common("gramaNiladhari") : common("resident");
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-slate-50 dark:bg-slate-950 transition-colors">
@@ -131,7 +137,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
         <div className="flex-1 overflow-auto py-4">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4 gap-1">
             {navigation.map((item) => {
-              const rootPath = role === "SUPER_ADMIN" ? "/super-admin" : role === "GN_OFFICER" ? "/gn-officer" : "/resident";
+              const rootPath = role === "SUPER_ADMIN" ? "/system-admin" : role === "PS_ADMIN" ? "/ps-admin" : role === "GN_OFFICER" ? "/gn-officer" : "/resident";
               const isActive = item.href === rootPath 
                 ? pathname === item.href 
                 : (pathname === item.href || pathname?.startsWith(item.href + "/"));
@@ -224,7 +230,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
                   <DropdownMenuItem 
-                    render={<Link href={role === "SUPER_ADMIN" ? "/super-admin/support" : role === "GN_OFFICER" ? "/gn-officer/support" : "/resident/support"} />}
+                    render={<Link href={role === "SUPER_ADMIN" ? "/system-admin/support" : role === "PS_ADMIN" ? "/ps-admin/support" : role === "GN_OFFICER" ? "/gn-officer/support" : "/resident/support"} />}
                     className="cursor-pointer dark:text-slate-300 dark:focus:bg-slate-800"
                   >
                     {common("support")}

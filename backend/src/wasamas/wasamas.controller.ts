@@ -18,7 +18,7 @@ export class WasamasController {
   constructor(private readonly wasamasService: WasamasService) {}
 
   @Post()
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.PS_ADMIN)
   createWasama(@Body() createWasamaDto: any, @Request() req: any) {
     return this.wasamasService.createWasama(
       createWasamaDto,
@@ -27,13 +27,13 @@ export class WasamasController {
   }
 
   @Get()
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.PS_ADMIN)
   findAll(@Request() req: any) {
     return this.wasamasService.findAllWasamas(req.user.pradeshiyaSabhaId);
   }
 
   @Post('officers')
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.PS_ADMIN)
   createOfficer(@Body() createOfficerDto: any, @Request() req: any) {
     return this.wasamasService.createOfficer(
       createOfficerDto,

@@ -10,7 +10,9 @@
     "notices": "Notice Board",
     "certificates": "Certificates",
     "myHousehold": "My Household",
-    "profile": "Profile"
+    "profile": "Profile",
+    "pradeshiyaSabhas": "Pradeshiya Sabhas",
+    "psAdmins": "PS Admins"
   },
   "Common": {
     "login": "Login",
@@ -43,7 +45,8 @@
     "gramaNiladhari": "Grama Niladhari",
     "resident": "Resident",
     "toggleMenu": "Toggle Menu",
-    "toggleUserMenu": "Toggle user menu"
+    "toggleUserMenu": "Toggle user menu",
+    "systemAdmin": "System Admin"
   },
   "Login": {
     "title": "Grama Niladhari System",

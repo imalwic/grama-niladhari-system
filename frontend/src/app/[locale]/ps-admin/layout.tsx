@@ -9,7 +9,7 @@ const MOCK_USER = {
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <DashboardLayout role="SUPER_ADMIN" user={MOCK_USER}>
+    <DashboardLayout role="PS_ADMIN" user={MOCK_USER}>
       {children}
     </DashboardLayout>
   );

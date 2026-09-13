@@ -10,7 +10,9 @@
     "notices": "දැන්වීම් පුවරුව",
     "certificates": "සහතික",
     "myHousehold": "මගේ නිවස",
-    "profile": "පැතිකඩ"
+    "profile": "පැතිකඩ",
+    "pradeshiyaSabhas": "ප්‍රාදේශීය සභා",
+    "psAdmins": "ප්‍රා. සභා පරිපාලකයින්"
   },
   "Common": {
     "login": "ඇතුල් වන්න",
@@ -43,7 +45,8 @@
     "gramaNiladhari": "ග්‍රාම නිලධාරී",
     "resident": "පදිංචිකරු",
     "toggleMenu": "මෙනුව මාරු කරන්න",
-    "toggleUserMenu": "පරිශීලක මෙනුව මාරු කරන්න"
+    "toggleUserMenu": "පරිශීලක මෙනුව මාරු කරන්න",
+    "systemAdmin": "ප්‍රධාන පරිපාලක"
   },
   "Login": {
     "title": "ග්‍රාම නිලධාරී පද්ධතිය",

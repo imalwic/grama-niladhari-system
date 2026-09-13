@@ -18,6 +18,7 @@ datasource db {
 
 enum Role {
   SUPER_ADMIN
+  PS_ADMIN
   GN_OFFICER
   RESIDENT
 }

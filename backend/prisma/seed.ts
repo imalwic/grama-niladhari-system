@@ -9,27 +9,59 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const adminEmail = 'admin@gov.lk';
+  const globalAdminEmail = 'system@gov.lk';
+  const psAdminEmail = 'admin@gov.lk';
   const rawPassword = 'adminPassword!123';
   const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
-  const admin = await prisma.user.upsert({
-    where: { email: adminEmail },
+  // 1. Create or ensure Pradeshiya Sabha exists
+  const ps = await prisma.pradeshiyaSabha.upsert({
+    where: { id: 'default-ps-id' }, // Just to ensure we can update it if needed, or by finding first.
+    update: {},
+    create: {
+      name: 'Weeraketiya Pradeshiya Sabha',
+      district: 'Hambantota',
+    },
+  });
+
+  // 2. Global Admin (SYSTEM_ADMIN -> SUPER_ADMIN)
+  const globalAdmin = await prisma.user.upsert({
+    where: { email: globalAdminEmail },
     update: {
       passwordHash: hashedPassword,
+      role: 'SUPER_ADMIN',
     },
     create: {
-      nic: '000000000V',
-      name: 'Super Admin',
-      email: adminEmail,
+      nic: '000000000X',
+      name: 'Global System Admin',
+      email: globalAdminEmail,
       passwordHash: hashedPassword,
       role: 'SUPER_ADMIN',
     },
   });
 
-  console.log(`[SEED] Admin created/updated:`);
-  console.log(`       Email:    ${admin.email}`);
-  console.log(`       Password: ${rawPassword}`);
+  // 3. PS Admin (PS_ADMIN for Weeraketiya)
+  const psAdmin = await prisma.user.upsert({
+    where: { email: psAdminEmail },
+    update: {
+      passwordHash: hashedPassword,
+      role: 'PS_ADMIN',
+      pradeshiyaSabhaId: ps.id,
+    },
+    create: {
+      nic: '000000000V',
+      name: 'Weeraketiya PS Admin',
+      email: psAdminEmail,
+      passwordHash: hashedPassword,
+      role: 'PS_ADMIN',
+      pradeshiyaSabhaId: ps.id,
+    },
+  });
+
+  console.log(`[SEED] Admins created/updated:`);
+  console.log(`       Global Admin: ${globalAdmin.email}`);
+  console.log(`       PS Admin:     ${psAdmin.email}`);
+  console.log(`       Password:     ${rawPassword}`);
 }
 
 main()

@@ -43,7 +43,8 @@ export default function LoginPage() {
       const tokenParts = data.access_token.split('.');
       if (tokenParts.length === 3) {
         const tokenPayload = JSON.parse(atob(tokenParts[1]));
-        if (tokenPayload.role === "SUPER_ADMIN") router.push("/super-admin");
+        if (tokenPayload.role === "SUPER_ADMIN") router.push("/system-admin");
+        else if (tokenPayload.role === "PS_ADMIN") router.push("/ps-admin");
         else if (tokenPayload.role === "GN_OFFICER") router.push("/gn-officer");
         else router.push("/resident");
       } else {

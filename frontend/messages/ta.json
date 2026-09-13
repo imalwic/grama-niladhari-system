@@ -10,7 +10,9 @@
     "notices": "அறிவிப்பு பலகை",
     "certificates": "சான்றிதழ்கள்",
     "myHousehold": "எனது குடும்பம்",
-    "profile": "சுயவிவரம்"
+    "profile": "சுயவிவரம்",
+    "pradeshiyaSabhas": "பிரதேச சபைகள்",
+    "psAdmins": "பிரதேச சபை நிர்வாகிகள்"
   },
   "Common": {
     "login": "உள்நுழைய",
@@ -43,7 +45,8 @@
     "gramaNiladhari": "கிராம உத்தியோகத்தர்",
     "resident": "குடியிருப்பாளர்",
     "toggleMenu": "மெனுவை மாற்று",
-    "toggleUserMenu": "பயனர் மெனுவை மாற்று"
+    "toggleUserMenu": "பயனர் மெனுவை மாற்று",
+    "systemAdmin": "கணினி நிர்வாகி"
   },
   "Login": {
     "title": "கிராம உத்தியோகத்தர் அமைப்பு",
