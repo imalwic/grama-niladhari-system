@@ -6,14 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, RefreshCw } from "lucide-react";
+import { Plus, Search, RefreshCw, Eye } from "lucide-react";
 import { AddPradeshiyaSabhaModal } from "@/components/system-admin/AddPradeshiyaSabhaModal";
+import { ViewPradeshiyaSabhaModal } from "@/components/system-admin/ViewPradeshiyaSabhaModal";
 
 export default function PradeshiyaSabhasPage() {
   const t = useTranslations("Common");
   const [data, setData] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedSabha, setSelectedSabha] = useState<any>(null);
 
   const fetchData = async () => {
     try {
@@ -90,7 +93,9 @@ export default function PradeshiyaSabhasPage() {
                     <TableCell>{ps._count?.wasamas || 0}</TableCell>
                     <TableCell>{ps._count?.users || 0}</TableCell>
                     <TableCell>
-                      <Button variant="outline" size="sm">View</Button>
+                      <Button variant="outline" size="sm" onClick={() => { setSelectedSabha(ps); setViewModalOpen(true); }}>
+                        <Eye className="h-4 w-4 mr-2" /> View
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -111,6 +116,13 @@ export default function PradeshiyaSabhasPage() {
         open={modalOpen} 
         onOpenChange={setModalOpen} 
         onSuccess={fetchData} 
+      />
+      
+      <ViewPradeshiyaSabhaModal
+        open={viewModalOpen}
+        onOpenChange={setViewModalOpen}
+        sabha={selectedSabha}
+        onSuccess={fetchData}
       />
     </div>
   );

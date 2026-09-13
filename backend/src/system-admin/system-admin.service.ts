@@ -37,6 +37,9 @@ export class SystemAdminService {
       include: {
         _count: {
           select: { wasamas: true, users: true }
+        },
+        users: {
+          select: { id: true, name: true, email: true, nic: true, phone: true }
         }
       }
     });
@@ -118,6 +121,33 @@ export class SystemAdminService {
         email: newAdmin.email,
       },
       temporaryPassword: tempPassword // Sent back to UI for QR code
+    };
+  }
+
+  async resetPsAdminPassword(adminId: string) {
+    const crypto = require('crypto');
+    const bcrypt = require('bcrypt');
+
+    const admin = await this.prisma.user.findUnique({
+      where: { id: adminId, role: 'PS_ADMIN' }
+    });
+
+    if (!admin) {
+      throw new Error("PS Admin not found");
+    }
+
+    const tempPassword = crypto.randomBytes(4).toString('hex');
+    const passwordHash = await bcrypt.hash(tempPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: adminId },
+      data: { passwordHash }
+    });
+
+    return {
+      message: 'Password reset successful',
+      email: admin.email,
+      temporaryPassword: tempPassword
     };
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { SystemAdminService } from './system-admin.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -44,5 +44,11 @@ export class SystemAdminController {
   @Roles(Role.SUPER_ADMIN)
   registerPradeshiyaSabhaWithAdmin(@Body() data: any) {
     return this.systemAdminService.registerPradeshiyaSabhaWithAdmin(data);
+  }
+
+  @Post('ps-admins/:id/reset-password')
+  @Roles(Role.SUPER_ADMIN)
+  resetPsAdminPassword(@Param('id') id: string) {
+    return this.systemAdminService.resetPsAdminPassword(id);
   }
 }
