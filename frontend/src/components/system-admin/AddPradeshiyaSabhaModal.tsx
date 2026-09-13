@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SRI_LANKA_DATA } from "@/lib/sl-data";
 import QRCode from "react-qr-code";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Download } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -96,6 +96,20 @@ export function AddPradeshiyaSabhaModal({ open, onOpenChange, onSuccess }: Props
       setAdminEmail("");
       setCredentials(null);
     }, 300);
+  };
+
+  const downloadQR = () => {
+    const svg = document.getElementById("ps-admin-qr-code");
+    if (!svg) return;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `PS-Admin-QR-${adminEmail}.svg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -189,15 +203,29 @@ export function AddPradeshiyaSabhaModal({ open, onOpenChange, onSuccess }: Props
             </DialogHeader>
             <div className="flex flex-col items-center justify-center py-6 space-y-6">
               {credentials && (
-                <div className="bg-white p-4 rounded-lg shadow-sm border">
-                  <QRCode value={`Email: ${credentials.email}\nPassword: ${credentials.password}`} size={200} />
+                <div className="bg-white p-4 rounded-lg shadow-sm border relative group">
+                  <QRCode id="ps-admin-qr-code" value={`Email: ${credentials.email}\nPassword: ${credentials.password}`} size={200} />
+                  <Button 
+                    size="icon" 
+                    variant="secondary" 
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={downloadQR}
+                    title="Download QR Code"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
                 </div>
               )}
               <div className="text-center space-y-1">
                 <p className="text-sm font-medium">Email: {credentials?.email}</p>
                 <p className="text-xs text-muted-foreground">The PS Admin can scan this code to login.</p>
               </div>
-              <Button onClick={handleClose} className="w-full">Done</Button>
+              <div className="flex gap-2 w-full">
+                <Button variant="outline" onClick={downloadQR} className="w-1/2">
+                  <Download className="mr-2 h-4 w-4" /> Download QR
+                </Button>
+                <Button onClick={handleClose} className="w-1/2 bg-[#003366] hover:bg-[#002244] text-white">Done</Button>
+              </div>
             </div>
           </>
         )}
