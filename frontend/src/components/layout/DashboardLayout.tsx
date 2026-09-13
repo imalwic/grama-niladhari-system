@@ -94,7 +94,6 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
   const systemAdminNav: SidebarItem[] = [
     { name: nav("overview"), href: "/system-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("pradeshiyaSabhas"), href: "/system-admin/pradeshiya-sabhas", icon: <LayoutDashboard className="h-5 w-5" /> },
-    { name: nav("psAdmins"), href: "/system-admin/ps-admins", icon: <Users className="h-5 w-5" /> },
   ];
 
   const psAdminNav: SidebarItem[] = [
