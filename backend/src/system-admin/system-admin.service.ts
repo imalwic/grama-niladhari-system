@@ -73,4 +73,51 @@ export class SystemAdminService {
       }
     });
   }
+
+  async registerPradeshiyaSabhaWithAdmin(data: any) {
+    const crypto = require('crypto');
+    const bcrypt = require('bcrypt');
+
+    // 1. Check if PS exists, else create
+    let ps = await this.prisma.pradeshiyaSabha.findFirst({
+      where: { name: data.sabhaName, district: data.district }
+    });
+
+    if (!ps) {
+      ps = await this.prisma.pradeshiyaSabha.create({
+        data: {
+          name: data.sabhaName,
+          district: data.district,
+        }
+      });
+    }
+
+    // 2. Generate a temporary password (e.g., 8 chars)
+    const tempPassword = crypto.randomBytes(4).toString('hex'); // 8 characters
+    const passwordHash = await bcrypt.hash(tempPassword, 10);
+
+    // 3. Create PS Admin
+    const newAdmin = await this.prisma.user.create({
+      data: {
+        name: data.adminName,
+        email: data.adminEmail,
+        nic: data.adminNic,
+        phone: data.adminPhone,
+        passwordHash,
+        role: 'PS_ADMIN',
+        pradeshiyaSabhaId: ps.id
+      }
+    });
+
+    return {
+      message: 'Registration successful',
+      pradeshiyaSabha: ps,
+      admin: {
+        id: newAdmin.id,
+        name: newAdmin.name,
+        email: newAdmin.email,
+      },
+      temporaryPassword: tempPassword // Sent back to UI for QR code
+    };
+  }
 }

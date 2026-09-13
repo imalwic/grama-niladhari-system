@@ -6,27 +6,30 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, RefreshCw } from "lucide-react";
+import { AddPradeshiyaSabhaModal } from "@/components/system-admin/AddPradeshiyaSabhaModal";
 
 export default function PradeshiyaSabhasPage() {
   const t = useTranslations("Common");
   const [data, setData] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:3001/system-admin/pradeshiya-sabhas", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setData(await res.json());
+      }
+    } catch (err) {
+      console.error("Failed to fetch Pradeshiya Sabhas", err);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:3001/system-admin/pradeshiya-sabhas", {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (res.ok) {
-          setData(await res.json());
-        }
-      } catch (err) {
-        console.error("Failed to fetch Pradeshiya Sabhas", err);
-      }
-    };
     fetchData();
   }, []);
 
@@ -42,9 +45,14 @@ export default function PradeshiyaSabhasPage() {
           <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">Pradeshiya Sabhas</h1>
           <p className="text-muted-foreground">Manage all Pradeshiya Sabhas across the country</p>
         </div>
-        <Button className="bg-[#003366] hover:bg-[#002244] text-white">
-          <Plus className="mr-2 h-4 w-4" /> Add Pradeshiya Sabha
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={fetchData} title="Refresh">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setModalOpen(true)} className="bg-[#003366] hover:bg-[#002244] text-white">
+            <Plus className="mr-2 h-4 w-4" /> Add Pradeshiya Sabha
+          </Button>
+        </div>
       </div>
 
       <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
@@ -98,6 +106,12 @@ export default function PradeshiyaSabhasPage() {
           </div>
         </CardContent>
       </Card>
+
+      <AddPradeshiyaSabhaModal 
+        open={modalOpen} 
+        onOpenChange={setModalOpen} 
+        onSuccess={fetchData} 
+      />
     </div>
   );
 }

@@ -39,4 +39,10 @@ export class SystemAdminController {
   createPsAdmin(@Body() data: any) {
     return this.systemAdminService.createPsAdmin(data);
   }
+
+  @Post('pradeshiya-sabhas/register')
+  @Roles(Role.SUPER_ADMIN)
+  registerPradeshiyaSabhaWithAdmin(@Body() data: any) {
+    return this.systemAdminService.registerPradeshiyaSabhaWithAdmin(data);
+  }
 }
