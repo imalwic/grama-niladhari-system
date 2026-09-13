@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { SystemAdminService } from './system-admin.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -14,5 +14,29 @@ export class SystemAdminController {
   @Roles(Role.SUPER_ADMIN)
   async getDashboardStats() {
     return this.systemAdminService.getDashboardStats();
+  }
+
+  @Get('pradeshiya-sabhas')
+  @Roles(Role.SUPER_ADMIN)
+  getPradeshiyaSabhas() {
+    return this.systemAdminService.getPradeshiyaSabhas();
+  }
+
+  @Post('pradeshiya-sabhas')
+  @Roles(Role.SUPER_ADMIN)
+  createPradeshiyaSabha(@Body() data: any) {
+    return this.systemAdminService.createPradeshiyaSabha(data);
+  }
+
+  @Get('ps-admins')
+  @Roles(Role.SUPER_ADMIN)
+  getPsAdmins() {
+    return this.systemAdminService.getPsAdmins();
+  }
+
+  @Post('ps-admins')
+  @Roles(Role.SUPER_ADMIN)
+  createPsAdmin(@Body() data: any) {
+    return this.systemAdminService.createPsAdmin(data);
   }
 }

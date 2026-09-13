@@ -15,14 +15,18 @@ async function main() {
   const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
   // 1. Create or ensure Pradeshiya Sabha exists
-  const ps = await prisma.pradeshiyaSabha.upsert({
-    where: { id: 'default-ps-id' }, // Just to ensure we can update it if needed, or by finding first.
-    update: {},
-    create: {
-      name: 'Weeraketiya Pradeshiya Sabha',
-      district: 'Hambantota',
-    },
+  let ps = await prisma.pradeshiyaSabha.findFirst({
+    where: { name: 'Weeraketiya' },
   });
+
+  if (!ps) {
+    ps = await prisma.pradeshiyaSabha.create({
+      data: {
+        name: 'Weeraketiya',
+        district: 'Hambantota',
+      },
+    });
+  }
 
   // 2. Global Admin (SYSTEM_ADMIN -> SUPER_ADMIN)
   const globalAdmin = await prisma.user.upsert({
