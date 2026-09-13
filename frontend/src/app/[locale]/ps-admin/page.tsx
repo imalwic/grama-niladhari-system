@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 export default function SuperAdminDashboard() {
   const t = useTranslations("SuperAdmin");
   
+  const [psName, setPsName] = useState<string>("Pradeshiya Sabha");
   const [stats, setStats] = useState<any>({
     totalResidents: 0,
     totalHouseholds: 0,
@@ -15,11 +16,25 @@ export default function SuperAdminDashboard() {
     pendingRequests: 0,
     recentActivity: []
   });
+
+  const parseJwt = (token: string) => {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+      return null;
+    }
+  };
   
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (token) {
+          const decoded = parseJwt(token);
+          if (decoded && decoded.pradeshiyaSabhaName) {
+            setPsName(decoded.pradeshiyaSabhaName);
+          }
+        }
         const res = await fetch("http://localhost:3001/admin/dashboard-stats", {
           headers: {
             "Authorization": `Bearer ${token}`
@@ -41,7 +56,7 @@ export default function SuperAdminDashboard() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("title")}</h1>
         <p className="text-muted-foreground">
-          {t("subtitle")}
+          Overview of all Grama Niladhari divisions under {psName} Pradeshiya Sabha.
         </p>
       </div>
 

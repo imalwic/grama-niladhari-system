@@ -17,6 +17,7 @@ export class AuthService {
       where: isEmail ? { email: identifier } : { nic: identifier },
       include: {
         wasama: true,
+        pradeshiyaSabha: true,
         residentProfile: {
           include: {
             household: {
@@ -55,6 +56,7 @@ export class AuthService {
       wasamaName: wasamaName,
       householdNo: householdNo,
       pradeshiyaSabhaId: user.pradeshiyaSabhaId,
+      pradeshiyaSabhaName: user.pradeshiyaSabha?.name || null,
       residentId: user.residentId,
       isVerified: user.residentProfile?.isVerified || false,
     };
