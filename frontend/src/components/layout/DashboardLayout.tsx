@@ -228,11 +228,21 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
+                  {role !== "SUPER_ADMIN" && (
+                    <DropdownMenuItem 
+                      render={<Link href={role === "PS_ADMIN" ? "/ps-admin/support" : role === "GN_OFFICER" ? "/gn-officer/support" : "/resident/support"} />}
+                      className="cursor-pointer dark:text-slate-300 dark:focus:bg-slate-800"
+                    >
+                      {common("support")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator className="dark:bg-slate-800 sm:hidden" />
                   <DropdownMenuItem 
-                    render={<Link href={role === "SUPER_ADMIN" ? "/system-admin/support" : role === "PS_ADMIN" ? "/ps-admin/support" : role === "GN_OFFICER" ? "/gn-officer/support" : "/resident/support"} />}
-                    className="cursor-pointer dark:text-slate-300 dark:focus:bg-slate-800"
+                    onClick={handleLogout}
+                    className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300 focus:bg-red-50 dark:focus:bg-red-900/20 sm:hidden"
                   >
-                    {common("support")}
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>{common("logout")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
