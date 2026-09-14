@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Home, MapPin, Activity } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#f43f5e', '#a855f7'];
 
 export default function SystemAdminDashboard() {
   const t = useTranslations("SuperAdmin");
@@ -15,7 +17,9 @@ export default function SystemAdminDashboard() {
     totalResidents: 0,
     totalPsAdmins: 0,
     recentActivity: [],
-    demographics: []
+    demographics: [],
+    categoryStats: [],
+    bottlenecks: []
   });
   
   useEffect(() => {
@@ -137,6 +141,68 @@ export default function SystemAdminDashboard() {
                 <p className="text-sm text-muted-foreground">No recent activity found.</p>
               )}
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* New Charts Row */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">
+        <Card className="col-span-3 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+          <CardHeader>
+            <CardTitle>Category Insights</CardTitle>
+            <CardDescription>Resident distribution by category</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[300px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4">
+            {stats.categoryStats && stats.categoryStats.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={stats.categoryStats}
+                    dataKey="count"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    fill="#8884d8"
+                    label
+                  >
+                    {stats.categoryStats.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground italic">No category data available yet</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-4 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+          <CardHeader>
+            <CardTitle>SLA & Bottleneck Tracking</CardTitle>
+            <CardDescription>Top 5 Pradeshiya Sabhas with most pending requests</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[300px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4">
+            {stats.bottlenecks && stats.bottlenecks.length > 0 && stats.bottlenecks.some((b: any) => b.pendingRequests > 0) ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.bottlenecks.filter((b: any) => b.pendingRequests > 0)} layout="vertical" margin={{ left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} horizontal={true} vertical={false} />
+                  <XAxis type="number" allowDecimals={false} />
+                  <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 12 }} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Bar dataKey="pendingRequests" name="Pending Requests" fill="#ef4444" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground italic">No pending requests bottleneck detected</p>
+            )}
           </CardContent>
         </Card>
       </div>

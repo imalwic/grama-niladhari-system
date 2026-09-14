@@ -14,6 +14,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { SupportModule } from './support/support.module';
 import { AdminModule } from './admin/admin.module';
 import { SystemAdminModule } from './system-admin/system-admin.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SystemAdminModule } from './system-admin/system-admin.module';
     SupportModule,
     AdminModule,
     SystemAdminModule,
+    AuditModule,
   ],
   controllers: [AppController],
   providers: [AppService],

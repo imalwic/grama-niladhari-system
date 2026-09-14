@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class SystemAdminService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private audit: AuditService) {}
 
   async getDashboardStats() {
-    const [totalPradeshiyaSabhas, totalGnDivisions, totalResidents, totalPsAdmins, recentActivityRaw, pradeshiyaSabhas] = await Promise.all([
+    const [totalPradeshiyaSabhas, totalGnDivisions, totalResidents, totalPsAdmins, recentActivityRaw, pradeshiyaSabhas, categoriesRaw, psWithRequestsRaw] = await Promise.all([
       this.prisma.pradeshiyaSabha.count(),
       this.prisma.wasama.count(),
       this.prisma.resident.count(),
@@ -22,6 +23,30 @@ export class SystemAdminService {
               households: {
                 include: {
                   _count: { select: { residents: true } }
+                }
+              }
+            }
+          }
+        }
+      }),
+      this.prisma.category.findMany({
+        include: {
+          _count: { select: { residents: true } }
+        }
+      }),
+      this.prisma.pradeshiyaSabha.findMany({
+        include: {
+          wasamas: {
+            include: {
+              households: {
+                include: {
+                  residents: {
+                    include: {
+                      _count: {
+                        select: { requests: { where: { status: 'PENDING' } } }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -48,13 +73,35 @@ export class SystemAdminService {
       };
     });
 
+    const categoryStats = categoriesRaw.map(c => ({
+      name: c.name,
+      count: c._count.residents
+    }));
+
+    const bottlenecks = psWithRequestsRaw.map(ps => {
+      let pendingCount = 0;
+      ps.wasamas.forEach(w => {
+        w.households.forEach(h => {
+          h.residents.forEach(r => {
+            pendingCount += r._count.requests;
+          });
+        });
+      });
+      return {
+        name: ps.name,
+        pendingRequests: pendingCount
+      };
+    }).sort((a, b) => b.pendingRequests - a.pendingRequests).slice(0, 5);
+
     return {
       totalPradeshiyaSabhas,
       totalGnDivisions,
       totalResidents,
       totalPsAdmins,
       recentActivity,
-      demographics
+      demographics,
+      categoryStats,
+      bottlenecks
     };
   }
 
@@ -72,13 +119,17 @@ export class SystemAdminService {
     });
   }
 
-  async createPradeshiyaSabha(data: any) {
-    return this.prisma.pradeshiyaSabha.create({
+  async createPradeshiyaSabha(data: any, userId?: string) {
+    const ps = await this.prisma.pradeshiyaSabha.create({
       data: {
         name: data.name,
         district: data.district,
       }
     });
+    if (userId) {
+      await this.audit.logAction('CREATE_PRADESHIYA_SABHA', 'PradeshiyaSabha', ps.id, userId, { name: ps.name });
+    }
+    return ps;
   }
 
   async getPsAdmins() {
@@ -89,10 +140,10 @@ export class SystemAdminService {
     });
   }
 
-  async createPsAdmin(data: any) {
+  async createPsAdmin(data: any, userId?: string) {
     const bcrypt = require('bcrypt');
     const passwordHash = await bcrypt.hash(data.password, 10);
-    return this.prisma.user.create({
+    const newAdmin = await this.prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
@@ -102,9 +153,13 @@ export class SystemAdminService {
         pradeshiyaSabhaId: data.pradeshiyaSabhaId
       }
     });
+    if (userId) {
+      await this.audit.logAction('CREATE_PS_ADMIN', 'User', newAdmin.id, userId, { email: newAdmin.email });
+    }
+    return newAdmin;
   }
 
-  async registerPradeshiyaSabhaWithAdmin(data: any) {
+  async registerPradeshiyaSabhaWithAdmin(data: any, userId?: string) {
     const crypto = require('crypto');
     const bcrypt = require('bcrypt');
 
@@ -138,6 +193,10 @@ export class SystemAdminService {
         pradeshiyaSabhaId: ps.id
       }
     });
+
+    if (userId) {
+      await this.audit.logAction('REGISTER_PS_WITH_ADMIN', 'PradeshiyaSabha', ps.id, userId, { psName: ps.name, adminEmail: newAdmin.email });
+    }
 
     return {
       message: 'Registration successful',
