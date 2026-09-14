@@ -132,6 +132,7 @@ model Resident {
 
   categoryTags ResidentCategory[]
   requests     Request[]
+  grievances   Grievance[]
 }
 
 model Category {
@@ -232,12 +233,19 @@ model AuditLog {
 }
 
 model Grievance {
-  id          String   @id @default(uuid())
-  subject     String
-  description String
-  status      String   @default("PENDING") // PENDING, INVESTIGATING, RESOLVED
-  reportedBy  String?
-  contactInfo String?
+  id             String   @id @default(uuid())
+  subject        String
+  description    String
+  status         String   @default("PENDING") // PENDING, INVESTIGATING, RESOLVED
+  assignedTo     String   @default("GLOBAL_ADMIN") // GN_OFFICER, GLOBAL_ADMIN
+  identityType   String   // NIC, PASSPORT, DRIVING_LICENSE
+  identityNumber String
+  reportedBy     String
+  contactInfo    String?
+  
+  wasamaId       String?
+  residentId     String?
+  resident       Resident? @relation(fields: [residentId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
