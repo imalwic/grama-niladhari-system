@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Home, MapPin, Activity } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a29bfe', '#fd79a8'];
 
 export default function SuperAdminDashboard() {
   const t = useTranslations("SuperAdmin");
@@ -14,7 +17,9 @@ export default function SuperAdminDashboard() {
     totalHouseholds: 0,
     gnDivisions: 0,
     pendingRequests: 0,
-    recentActivity: []
+    recentActivity: [],
+    ageDemographics: [],
+    relationships: []
   });
 
   const parseJwt = (token: string) => {
@@ -116,9 +121,58 @@ export default function SuperAdminDashboard() {
               {t("populationDistribution")}
             </CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700">
-            {/* Chart Placeholder */}
-            <p className="text-muted-foreground italic">{t("chartPlaceholder")}</p>
+          <CardContent className="h-[300px] flex flex-col md:flex-row items-center justify-around border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4 gap-4">
+            {stats.ageDemographics && stats.ageDemographics.length > 0 ? (
+              <div className="w-full md:w-1/2 h-full">
+                <p className="text-sm text-center font-medium mb-2">Age Distribution</p>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={stats.ageDemographics}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {stats.ageDemographics.map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p className="text-muted-foreground italic">No age demographic data available.</p>
+            )}
+
+            {stats.relationships && stats.relationships.length > 0 && (
+              <div className="w-full md:w-1/2 h-full">
+                <p className="text-sm text-center font-medium mb-2">Household Relationships</p>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={stats.relationships}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {stats.relationships.map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </CardContent>
         </Card>
         <Card className="col-span-3 shadow-sm dark:bg-slate-900 dark:border-slate-800 overflow-y-auto max-h-[400px]">

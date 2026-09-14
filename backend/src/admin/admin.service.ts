@@ -10,7 +10,7 @@ export class AdminService {
        return { totalResidents: 0, totalHouseholds: 0, gnDivisions: 0, pendingRequests: 0, recentActivity: [] };
     }
 
-    const [totalResidents, totalHouseholds, gnDivisions, pendingRequests, recentActivityRaw] = await Promise.all([
+    const [totalResidents, totalHouseholds, gnDivisions, pendingRequests, recentActivityRaw, allResidents] = await Promise.all([
       this.prisma.resident.count({
         where: { household: { wasama: { pradeshiyaSabhaId } } }
       }),
@@ -28,6 +28,10 @@ export class AdminService {
         orderBy: { createdAt: 'desc' },
         take: 5,
         include: { household: { include: { wasama: true } } }
+      }),
+      this.prisma.resident.findMany({
+        where: { household: { wasama: { pradeshiyaSabhaId } } },
+        select: { dateOfBirth: true, relationshipToHead: true }
       })
     ]);
 
@@ -36,12 +40,40 @@ export class AdminService {
       time: r.createdAt
     }));
 
+    // Demographics Calculation
+    const currentYear = new Date().getFullYear();
+    let ageDemographics = [
+      { name: '0-18', value: 0 },
+      { name: '19-35', value: 0 },
+      { name: '36-60', value: 0 },
+      { name: '60+', value: 0 },
+    ];
+    let relationshipDemographics: Record<string, number> = {};
+
+    allResidents.forEach(res => {
+      const age = currentYear - res.dateOfBirth.getFullYear();
+      if (age <= 18) ageDemographics[0].value++;
+      else if (age <= 35) ageDemographics[1].value++;
+      else if (age <= 60) ageDemographics[2].value++;
+      else ageDemographics[3].value++;
+
+      const rel = res.relationshipToHead || 'Other';
+      relationshipDemographics[rel] = (relationshipDemographics[rel] || 0) + 1;
+    });
+
+    const relationships = Object.keys(relationshipDemographics).map(key => ({
+      name: key,
+      value: relationshipDemographics[key]
+    }));
+
     return {
       totalResidents,
       totalHouseholds,
       gnDivisions,
       pendingRequests,
-      recentActivity
+      recentActivity,
+      ageDemographics,
+      relationships
     };
   }
 }
