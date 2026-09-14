@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, ArrowLeft, Search, FileText, Checkbox } from "lucide-react";
+import { Plus, ArrowLeft, Search, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type SharedDocument = {
@@ -37,6 +37,7 @@ export default function GlobalAdminDocumentsPage() {
   // Form State
   const [title, setTitle] = useState("");
   const [fileUrl, setFileUrl] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [selectedPsIds, setSelectedPsIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -56,7 +57,7 @@ export default function GlobalAdminDocumentsPage() {
   const fetchPsList = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:3001/pradeshiya-sabhas", {
+      const res = await fetch("http://localhost:3001/system-admin/pradeshiya-sabhas", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) setPsList(await res.json());
@@ -80,19 +81,30 @@ export default function GlobalAdminDocumentsPage() {
     setIsLoading(true);
     setErrorMsg("");
 
+    if (!fileUrl && !file) {
+      setErrorMsg("Please provide a File URL or upload a file.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
+      
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("pradeshiyaSabhaIds", JSON.stringify(selectedPsIds));
+      if (file) {
+        formData.append("file", file);
+      } else {
+        formData.append("fileUrl", fileUrl);
+      }
+
       const res = await fetch("http://localhost:3001/documents", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
           "Authorization": `Bearer ${token}` 
         },
-        body: JSON.stringify({
-          title,
-          fileUrl,
-          pradeshiyaSabhaIds: selectedPsIds
-        }),
+        body: formData,
       });
 
       if (!res.ok) throw new Error("Failed to share document");
@@ -100,6 +112,7 @@ export default function GlobalAdminDocumentsPage() {
       setIsFormView(false);
       setTitle("");
       setFileUrl("");
+      setFile(null);
       setSelectedPsIds([]);
     } catch (error: any) {
       setErrorMsg(error.message || "Something went wrong.");
@@ -147,16 +160,39 @@ export default function GlobalAdminDocumentsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="fileUrl">File URL (Google Drive, PDF Link, etc.)</Label>
-                  <Input 
-                    id="fileUrl" 
-                    type="url"
-                    placeholder="https://..." 
-                    value={fileUrl}
-                    onChange={(e) => setFileUrl(e.target.value)}
-                    required 
-                    className="dark:bg-slate-800 dark:border-slate-700" 
-                  />
+                  <Label>Document File</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="fileUpload" className="text-xs text-muted-foreground">Upload from computer</Label>
+                      <Input 
+                        id="fileUpload" 
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) => {
+                          setFile(e.target.files?.[0] || null);
+                          if (e.target.files?.[0]) setFileUrl("");
+                        }}
+                        className="dark:bg-slate-800 dark:border-slate-700" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="fileUrl" className="text-xs text-muted-foreground">OR enter an external URL</Label>
+                      <Input 
+                        id="fileUrl" 
+                        type="url"
+                        placeholder="https://..." 
+                        value={fileUrl}
+                        onChange={(e) => {
+                          setFileUrl(e.target.value);
+                          if (e.target.value) setFile(null);
+                        }}
+                        className="dark:bg-slate-800 dark:border-slate-700" 
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Provide either an uploaded PDF file OR a direct link (e.g. Google Drive link).
+                  </p>
                 </div>
               </div>
 
