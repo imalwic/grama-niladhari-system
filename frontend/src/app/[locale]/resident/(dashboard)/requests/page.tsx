@@ -147,6 +147,24 @@ export default function ResidentRequests() {
   useEffect(() => {
     fetchRequests();
   }, []);
+
+  const handleDownloadCertificate = async (reqId: string) => {
+    try {
+      const res = await fetch(`http://localhost:3001/requests/${reqId}/certificate`, {
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } else {
+        alert("Certificate not available yet.");
+      }
+    } catch (err) {
+      console.error("Failed to fetch certificate", err);
+    }
+  };
+
   const t = useTranslations("Resident");
   const c = useTranslations("Common");
 
@@ -302,7 +320,12 @@ export default function ResidentRequests() {
                 <TableCell>{getStatusBadge(req.status)}</TableCell>
                 <TableCell className="text-right">
                   {req.status === "APPROVED" && (
-                    <Button variant="outline" size="sm" className="h-8 text-green-700 border-green-200 bg-green-50 hover:bg-green-100 dark:bg-green-900 dark:text-green-300 dark:border-green-800 dark:hover:bg-green-800">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 text-green-700 border-green-200 bg-green-50 hover:bg-green-100 dark:bg-green-900 dark:text-green-300 dark:border-green-800 dark:hover:bg-green-800"
+                      onClick={() => handleDownloadCertificate(req.id)}
+                    >
                       <Download className="mr-2 h-3 w-3" /> {t("downloadPdf")}
                     </Button>
                   )}

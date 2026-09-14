@@ -98,6 +98,23 @@ export default function GnOfficerRequests() {
     }
   };
 
+  const handleDownloadCertificate = async (reqId: string) => {
+    try {
+      const res = await fetch(`http://localhost:3001/requests/${reqId}/certificate`, {
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } else {
+        alert("Certificate not available yet.");
+      }
+    } catch (err) {
+      console.error("Failed to fetch certificate", err);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -205,8 +222,13 @@ export default function GnOfficerRequests() {
                     </Dialog>
                   )}
                   {req.status === "APPROVED" && (
-                    <Button variant="ghost" size="sm" className="h-8 text-slate-500 dark:text-slate-400" disabled>
-                      {t("processed")}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 text-green-700 border-green-300 bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:border-green-800 dark:text-green-400" 
+                      onClick={() => handleDownloadCertificate(req.id)}
+                    >
+                      <Download className="w-3 h-3 mr-2" /> Download Cert.
                     </Button>
                   )}
                 </TableCell>
