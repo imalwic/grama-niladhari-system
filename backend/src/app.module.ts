@@ -15,6 +15,7 @@ import { SupportModule } from './support/support.module';
 import { AdminModule } from './admin/admin.module';
 import { SystemAdminModule } from './system-admin/system-admin.module';
 import { AuditModule } from './audit/audit.module';
+import { GrievancesModule } from './grievances/grievances.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuditModule } from './audit/audit.module';
     AdminModule,
     SystemAdminModule,
     AuditModule,
+    GrievancesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
