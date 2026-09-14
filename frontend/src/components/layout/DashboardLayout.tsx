@@ -16,7 +16,8 @@ import {
   FileText,
   Moon,
   Type,
-  Globe
+  Globe,
+  AlertTriangle
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -94,6 +95,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
   const systemAdminNav: SidebarItem[] = [
     { name: nav("overview"), href: "/system-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("pradeshiyaSabhas"), href: "/system-admin/pradeshiya-sabhas", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { name: "Grievances", href: "/system-admin/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
   ];
 
   const psAdminNav: SidebarItem[] = [
@@ -108,6 +110,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("residents"), href: "/gn-officer/residents", icon: <Users className="h-5 w-5" /> },
     { name: nav("requests"), href: "/gn-officer/requests", icon: <FileText className="h-5 w-5" /> },
     { name: nav("notices"), href: "/gn-officer/notices", icon: <Bell className="h-5 w-5" /> },
+    { name: "Grievances", href: "/gn-officer/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
     { name: nav("settings"), href: "/gn-officer/settings", icon: <Settings className="h-5 w-5" /> },
   ];
 
@@ -116,6 +119,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("myHousehold"), href: "/resident/household", icon: <Home className="h-5 w-5" /> },
     { name: nav("certificates"), href: "/resident/requests", icon: <FileText className="h-5 w-5" /> },
     { name: nav("notices"), href: "/resident/notices", icon: <Bell className="h-5 w-5" /> },
+    { name: "Grievances", href: "/resident/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
   ];
 
   const navigation = role === "SUPER_ADMIN" ? systemAdminNav : role === "PS_ADMIN" ? psAdminNav : role === "GN_OFFICER" ? gnOfficerNav : residentNav;
