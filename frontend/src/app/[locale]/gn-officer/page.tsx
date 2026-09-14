@@ -1,12 +1,41 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Home, FileText, CheckCircle } from "lucide-react";
+import { Users, Home, FileText, CheckCircle, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
 export default function GnOfficerDashboard() {
   const t = useTranslations("GnOfficer");
+  const [stats, setStats] = useState({
+    totalHouseholds: 0,
+    totalResidents: 0,
+    pendingRequests: 0,
+    issuedCertificates: 0,
+    newVoters: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:3001/wasamas/dashboard-stats", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch dashboard stats", err);
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -23,7 +52,7 @@ export default function GnOfficerDashboard() {
             <Users className="h-4 w-4 text-[#003366] dark:text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">842</div>
+            <div className="text-2xl font-bold">{stats.totalResidents}</div>
             <p className="text-xs text-muted-foreground">{t("addedThisWeek")}</p>
           </CardContent>
         </Card>
@@ -33,7 +62,7 @@ export default function GnOfficerDashboard() {
             <Home className="h-4 w-4 text-[#003366] dark:text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">215</div>
+            <div className="text-2xl font-bold">{stats.totalHouseholds}</div>
           </CardContent>
         </Card>
         <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
@@ -42,7 +71,7 @@ export default function GnOfficerDashboard() {
             <FileText className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">8</div>
+            <div className="text-2xl font-bold text-orange-600">{stats.pendingRequests}</div>
             <p className="text-xs text-muted-foreground">{t("needsApproval")}</p>
           </CardContent>
         </Card>
@@ -52,8 +81,22 @@ export default function GnOfficerDashboard() {
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">145</div>
+            <div className="text-2xl font-bold">{stats.issuedCertificates}</div>
             <p className="text-xs text-muted-foreground">{t("thisYear")}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* New Row for Electoral Register */}
+      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3 mt-4">
+        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-blue-50/50 dark:bg-blue-900/10">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">New Eligible Voters (18+)</CardTitle>
+            <UserCheck className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.newVoters}</div>
+            <p className="text-xs text-muted-foreground mt-1">Within your Wasama</p>
           </CardContent>
         </Card>
       </div>

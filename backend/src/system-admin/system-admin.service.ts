@@ -7,7 +7,11 @@ export class SystemAdminService {
   constructor(private prisma: PrismaService, private audit: AuditService) {}
 
   async getDashboardStats() {
-    const [totalPradeshiyaSabhas, totalGnDivisions, totalResidents, totalPsAdmins, recentActivityRaw, pradeshiyaSabhas, categoriesRaw, psWithRequestsRaw] = await Promise.all([
+    const currentYear = new Date().getFullYear();
+    const startOf18YearsAgo = new Date(currentYear - 18, 0, 1);
+    const endOf18YearsAgo = new Date(currentYear - 18, 11, 31, 23, 59, 59);
+
+    const [totalPradeshiyaSabhas, totalGnDivisions, totalResidents, totalPsAdmins, recentActivityRaw, pradeshiyaSabhas, categoriesRaw, psWithRequestsRaw, newVoters, householdsRaw, pendingGrievances] = await Promise.all([
       this.prisma.pradeshiyaSabha.count(),
       this.prisma.wasama.count(),
       this.prisma.resident.count(),
@@ -52,6 +56,25 @@ export class SystemAdminService {
             }
           }
         }
+      }),
+      this.prisma.resident.count({
+        where: {
+          dateOfBirth: {
+            gte: startOf18YearsAgo,
+            lte: endOf18YearsAgo
+          }
+        }
+      }),
+      this.prisma.household.findMany({
+        include: {
+          _count: { select: { residents: true } },
+          wasama: {
+            include: { pradeshiyaSabha: true }
+          }
+        }
+      }),
+      this.prisma.grievance.count({
+        where: { status: 'PENDING' }
       })
     ]);
 
@@ -93,6 +116,16 @@ export class SystemAdminService {
       };
     }).sort((a, b) => b.pendingRequests - a.pendingRequests).slice(0, 5);
 
+    const anomalies = householdsRaw
+      .filter(h => h._count.residents > 10)
+      .map(h => ({
+        householdNo: h.houseNumber,
+        wasamaName: h.wasama?.name || 'Unknown',
+        pradeshiyaSabhaName: h.wasama?.pradeshiyaSabha?.name || 'Unknown',
+        residentCount: h._count.residents
+      }))
+      .slice(0, 10);
+
     return {
       totalPradeshiyaSabhas,
       totalGnDivisions,
@@ -101,7 +134,10 @@ export class SystemAdminService {
       recentActivity,
       demographics,
       categoryStats,
-      bottlenecks
+      bottlenecks,
+      newVoters,
+      pendingGrievances,
+      anomalies
     };
   }
 

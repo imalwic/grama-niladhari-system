@@ -17,6 +17,12 @@ import { Role } from '@prisma/client';
 export class WasamasController {
   constructor(private readonly wasamasService: WasamasService) {}
 
+  @Get('dashboard-stats')
+  @Roles(Role.GN_OFFICER)
+  getDashboardStats(@Request() req: any) {
+    return this.wasamasService.getDashboardStats(req.user.wasamaId);
+  }
+
   @Post()
   @Roles(Role.PS_ADMIN)
   createWasama(@Body() createWasamaDto: any, @Request() req: any) {

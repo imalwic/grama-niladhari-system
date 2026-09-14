@@ -54,4 +54,44 @@ export class WasamasService {
       },
     });
   }
+
+  async getDashboardStats(wasamaId: string) {
+    const currentYear = new Date().getFullYear();
+    const startOf18YearsAgo = new Date(currentYear - 18, 0, 1);
+    const endOf18YearsAgo = new Date(currentYear - 18, 11, 31, 23, 59, 59);
+
+    const [totalHouseholds, totalResidents, newVoters, pendingRequests, issuedCertificates] = await Promise.all([
+      this.prisma.household.count({ where: { wasamaId } }),
+      this.prisma.resident.count({ where: { household: { wasamaId } } }),
+      this.prisma.resident.count({
+        where: {
+          household: { wasamaId },
+          dateOfBirth: {
+            gte: startOf18YearsAgo,
+            lte: endOf18YearsAgo
+          }
+        }
+      }),
+      this.prisma.request.count({
+        where: {
+          resident: { household: { wasamaId } },
+          status: 'PENDING'
+        }
+      }),
+      this.prisma.request.count({
+        where: {
+          resident: { household: { wasamaId } },
+          status: 'APPROVED'
+        }
+      })
+    ]);
+
+    return {
+      totalHouseholds,
+      totalResidents,
+      newVoters,
+      pendingRequests,
+      issuedCertificates
+    };
+  }
 }

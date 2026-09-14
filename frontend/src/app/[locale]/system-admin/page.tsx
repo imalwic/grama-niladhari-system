@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Home, MapPin, Activity } from "lucide-react";
+import { Users, Home, MapPin, Activity, UserCheck, MessageSquare, AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
@@ -19,7 +19,10 @@ export default function SystemAdminDashboard() {
     recentActivity: [],
     demographics: [],
     categoryStats: [],
-    bottlenecks: []
+    bottlenecks: [],
+    newVoters: 0,
+    pendingGrievances: 0,
+    anomalies: []
   });
   
   useEffect(() => {
@@ -86,6 +89,39 @@ export default function SystemAdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalResidents.toLocaleString()}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-blue-50/50 dark:bg-blue-900/10">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">New Eligible Voters (18+ This Year)</CardTitle>
+            <UserCheck className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.newVoters.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground mt-1">Electoral Register Updates</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-red-50/50 dark:bg-red-900/10">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Open Public Grievances</CardTitle>
+            <MessageSquare className="h-4 w-4 text-red-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.pendingGrievances.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground mt-1">Requires Admin Attention</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-amber-50/50 dark:bg-amber-900/10">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Fraud & Data Anomalies</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.anomalies ? stats.anomalies.length : 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Flagged Households (&gt; 10 members)</p>
           </CardContent>
         </Card>
       </div>
@@ -202,6 +238,49 @@ export default function SystemAdminDashboard() {
               </ResponsiveContainer>
             ) : (
               <p className="text-muted-foreground italic">No pending requests bottleneck detected</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Fraud Detection Table */}
+      <div className="grid gap-4 mt-4">
+        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
+          <CardHeader>
+            <CardTitle className="text-amber-600 dark:text-amber-500 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              System Anomalies (Fraud Detection)
+            </CardTitle>
+            <CardDescription>Households flagged automatically for exceeding normal member limits (&gt;10)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {stats.anomalies && stats.anomalies.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-muted-foreground uppercase bg-slate-50 dark:bg-slate-800/50">
+                    <tr>
+                      <th className="px-4 py-3">Household No</th>
+                      <th className="px-4 py-3">Grama Niladhari Division</th>
+                      <th className="px-4 py-3">Pradeshiya Sabha</th>
+                      <th className="px-4 py-3 text-right">Resident Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.anomalies.map((anomaly: any, i: number) => (
+                      <tr key={i} className="border-b dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
+                        <td className="px-4 py-3 font-medium text-amber-600">{anomaly.householdNo}</td>
+                        <td className="px-4 py-3">{anomaly.wasamaName}</td>
+                        <td className="px-4 py-3">{anomaly.pradeshiyaSabhaName}</td>
+                        <td className="px-4 py-3 text-right font-bold text-red-600">{anomaly.residentCount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center p-8 text-muted-foreground border border-dashed rounded-lg">
+                <p>No anomalies detected in the system. Data looks clean!</p>
+              </div>
             )}
           </CardContent>
         </Card>

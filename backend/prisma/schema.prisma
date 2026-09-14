@@ -230,3 +230,14 @@ model AuditLog {
 
   user        User     @relation(fields: [performedBy], references: [id])
 }
+
+model Grievance {
+  id          String   @id @default(uuid())
+  subject     String
+  description String
+  status      String   @default("PENDING") // PENDING, INVESTIGATING, RESOLVED
+  reportedBy  String?
+  contactInfo String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
