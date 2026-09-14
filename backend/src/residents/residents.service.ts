@@ -41,6 +41,26 @@ export class ResidentsService {
     });
   }
 
+  async findVotersByWasama(wasamaId: string) {
+    const currentYear = new Date().getFullYear();
+    const startOf18YearsAgo = new Date(currentYear - 18, 11, 31, 23, 59, 59);
+
+    return this.prisma.resident.findMany({
+      where: {
+        household: { wasamaId },
+        dateOfBirth: {
+          lte: startOf18YearsAgo
+        }
+      },
+      include: {
+        household: true
+      },
+      orderBy: {
+        fullName: 'asc'
+      }
+    });
+  }
+
   async findOne(id: string, wasamaId: string) {
     const resident = await this.prisma.resident.findFirst({
       where: {

@@ -32,6 +32,12 @@ export class ResidentsController {
     return this.residentsService.findAllByWasama(req.user.wasamaId);
   }
 
+  @Get('voters')
+  @Roles(Role.GN_OFFICER)
+  getVoters(@Request() req: any) {
+    return this.residentsService.findVotersByWasama(req.user.wasamaId);
+  }
+
   @Get(':id')
   @Roles(Role.GN_OFFICER)
   findOne(@Param('id') id: string, @Request() req: any) {
