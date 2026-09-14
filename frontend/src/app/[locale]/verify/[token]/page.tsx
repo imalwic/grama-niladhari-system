@@ -4,7 +4,7 @@ import { ShieldCheckIcon, XCircleIcon } from "lucide-react";
 // Since this is a server component, we can fetch the data directly
 async function getVerificationData(token: string) {
   try {
-    const res = await fetch(`http://localhost:3001/api/verify/${token}`, {
+    const res = await fetch(`http://localhost:3001/verify/${token}`, {
       // Don't cache verification results
       cache: "no-store", 
     });
