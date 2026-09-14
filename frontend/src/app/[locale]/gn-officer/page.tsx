@@ -5,6 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, Home, FileText, CheckCircle, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a29bfe', '#fd79a8'];
 
 export default function GnOfficerDashboard() {
   const t = useTranslations("GnOfficer");
@@ -13,13 +16,24 @@ export default function GnOfficerDashboard() {
     totalResidents: 0,
     pendingRequests: 0,
     issuedCertificates: 0,
-    newVoters: 0
+    newVoters: 0,
+    ageDemographics: [],
+    relationships: []
   });
+  const [subtitle, setSubtitle] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.wasamaName) {
+              setSubtitle(`Welcome back. Here is the overview for ${payload.wasamaName}.`);
+            }
+          } catch (e) {}
+        }
         const res = await fetch("http://localhost:3001/wasamas/dashboard-stats", {
           headers: {
             "Authorization": `Bearer ${token}`
@@ -41,7 +55,7 @@ export default function GnOfficerDashboard() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("title")}</h1>
         <p className="text-muted-foreground">
-          {t("subtitle")}
+          {subtitle || t("subtitle")}
         </p>
       </div>
 
@@ -87,7 +101,7 @@ export default function GnOfficerDashboard() {
         </Card>
       </div>
 
-      {/* New Row for Electoral Register */}
+      {/* New Row for Electoral Register & Analytics */}
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3 mt-4">
         <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-blue-50/50 dark:bg-blue-900/10">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -97,6 +111,63 @@ export default function GnOfficerDashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.newVoters}</div>
             <p className="text-xs text-muted-foreground mt-1">Within your Wasama</p>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 col-span-1 lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Demographics Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col md:flex-row items-center justify-around gap-4 h-64">
+            {stats.ageDemographics && stats.ageDemographics.length > 0 && (
+              <div className="w-full md:w-1/2 h-full">
+                <p className="text-sm text-center font-medium mb-2">Age Distribution</p>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={stats.ageDemographics}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {stats.ageDemographics.map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+            
+            {stats.relationships && stats.relationships.length > 0 && (
+              <div className="w-full md:w-1/2 h-full">
+                <p className="text-sm text-center font-medium mb-2">Household Relationships</p>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={stats.relationships}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {stats.relationships.map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

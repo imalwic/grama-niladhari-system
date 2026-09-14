@@ -86,12 +86,45 @@ export class WasamasService {
       })
     ]);
 
+    // Calculate Age Groups (0-18, 19-35, 36-60, 60+)
+    const allResidents = await this.prisma.resident.findMany({
+      where: { household: { wasamaId } },
+      select: { dateOfBirth: true, relationshipToHead: true }
+    });
+
+    let ageDemographics = [
+      { name: '0-18', value: 0 },
+      { name: '19-35', value: 0 },
+      { name: '36-60', value: 0 },
+      { name: '60+', value: 0 },
+    ];
+
+    let relationshipDemographics: Record<string, number> = {};
+
+    allResidents.forEach(res => {
+      const age = currentYear - res.dateOfBirth.getFullYear();
+      if (age <= 18) ageDemographics[0].value++;
+      else if (age <= 35) ageDemographics[1].value++;
+      else if (age <= 60) ageDemographics[2].value++;
+      else ageDemographics[3].value++;
+
+      const rel = res.relationshipToHead || 'Other';
+      relationshipDemographics[rel] = (relationshipDemographics[rel] || 0) + 1;
+    });
+
+    const relationships = Object.keys(relationshipDemographics).map(key => ({
+      name: key,
+      value: relationshipDemographics[key]
+    }));
+
     return {
       totalHouseholds,
       totalResidents,
       newVoters,
       pendingRequests,
-      issuedCertificates
+      issuedCertificates,
+      ageDemographics,
+      relationships
     };
   }
 }

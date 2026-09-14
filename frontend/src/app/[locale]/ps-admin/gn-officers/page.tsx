@@ -23,7 +23,7 @@ export default function GnManagement() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", nic: "", division: "", email: "" });
+  const [formData, setFormData] = useState({ name: "", nic: "", division: "", email: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -84,11 +84,12 @@ export default function GnManagement() {
           nic: formData.nic,
           email: formData.email,
           wasamaCode: formData.division, // We expect name or code here
+          password: formData.password || "password123",
         }),
       });
       if (res.ok) {
         setIsDialogOpen(false);
-        setFormData({ name: "", nic: "", division: "", email: "" });
+        setFormData({ name: "", nic: "", division: "", email: "", password: "" });
         await fetchOfficersAndWasamas();
       } else {
         const errorData = await res.json();
@@ -170,6 +171,10 @@ export default function GnManagement() {
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="email" className="text-right">{t("email")}</Label>
                   <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="col-span-3" placeholder={t("email")} />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="password" className="text-right">Password</Label>
+                  <Input id="password" type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="col-span-3" placeholder="Leave blank for 'password123'" />
                 </div>
               </div>
               <DialogFooter>
