@@ -6,7 +6,7 @@ export class SystemAdminService {
   constructor(private prisma: PrismaService) {}
 
   async getDashboardStats() {
-    const [totalPradeshiyaSabhas, totalGnDivisions, totalResidents, totalPsAdmins, recentActivityRaw] = await Promise.all([
+    const [totalPradeshiyaSabhas, totalGnDivisions, totalResidents, totalPsAdmins, recentActivityRaw, pradeshiyaSabhas] = await Promise.all([
       this.prisma.pradeshiyaSabha.count(),
       this.prisma.wasama.count(),
       this.prisma.resident.count(),
@@ -14,6 +14,19 @@ export class SystemAdminService {
       this.prisma.pradeshiyaSabha.findMany({
         orderBy: { createdAt: 'desc' },
         take: 5
+      }),
+      this.prisma.pradeshiyaSabha.findMany({
+        include: {
+          wasamas: {
+            include: {
+              households: {
+                include: {
+                  _count: { select: { residents: true } }
+                }
+              }
+            }
+          }
+        }
       })
     ]);
 
@@ -22,12 +35,26 @@ export class SystemAdminService {
       time: ps.createdAt
     }));
 
+    const demographics = pradeshiyaSabhas.map(ps => {
+      let population = 0;
+      ps.wasamas.forEach(w => {
+        w.households.forEach(h => {
+          population += h._count.residents;
+        });
+      });
+      return {
+        name: ps.name,
+        population
+      };
+    });
+
     return {
       totalPradeshiyaSabhas,
       totalGnDivisions,
       totalResidents,
       totalPsAdmins,
-      recentActivity
+      recentActivity,
+      demographics
     };
   }
 

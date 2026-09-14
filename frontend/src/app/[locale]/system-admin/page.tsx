@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Home, MapPin, Activity } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function SystemAdminDashboard() {
   const t = useTranslations("SuperAdmin");
@@ -13,7 +14,8 @@ export default function SystemAdminDashboard() {
     totalGnDivisions: 0,
     totalResidents: 0,
     totalPsAdmins: 0,
-    recentActivity: []
+    recentActivity: [],
+    demographics: []
   });
   
   useEffect(() => {
@@ -92,9 +94,22 @@ export default function SystemAdminDashboard() {
               Population distribution across Pradeshiya Sabhas
             </CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700">
-            {/* Chart Placeholder */}
-            <p className="text-muted-foreground italic">Chart showing population per district/PS</p>
+          <CardContent className="h-[300px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4">
+            {stats.demographics && stats.demographics.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.demographics}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Bar dataKey="population" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground italic">No demographics data available yet</p>
+            )}
           </CardContent>
         </Card>
         <Card className="col-span-3 shadow-sm dark:bg-slate-900 dark:border-slate-800 overflow-y-auto max-h-[400px]">
