@@ -93,17 +93,7 @@ export default function SystemAdminDashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-blue-50/50 dark:bg-blue-900/10">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">New Eligible Voters (18+ This Year)</CardTitle>
-            <UserCheck className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.newVoters.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">Electoral Register Updates</p>
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 md:grid-cols-2">
         <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-red-50/50 dark:bg-red-900/10">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Open Public Grievances</CardTitle>
