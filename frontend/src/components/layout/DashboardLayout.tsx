@@ -17,7 +17,9 @@ import {
   Moon,
   Type,
   Globe,
-  AlertTriangle
+  AlertTriangle,
+  Gift,
+  Calendar
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -57,8 +59,19 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
 
   const [darkMode, setDarkMode] = useState(false);
   const [largeText, setLargeText] = useState(false);
+  const [currentUser, setCurrentUser] = useState(user);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setCurrentUser({
+          name: payload.name || user.name,
+          email: payload.email || user.email,
+        });
+      } catch (e) {}
+    }
     const storedDark = localStorage.getItem("dark-mode") === "true";
     const storedText = localStorage.getItem("large-text") === "true";
     
@@ -110,7 +123,10 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("dashboard"), href: "/gn-officer", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("households"), href: "/gn-officer/households", icon: <Home className="h-5 w-5" /> },
     { name: nav("residents"), href: "/gn-officer/residents", icon: <Users className="h-5 w-5" /> },
+    { name: "Voters Registry", href: "/gn-officer/voters", icon: <Users className="h-5 w-5" /> },
     { name: nav("requests"), href: "/gn-officer/requests", icon: <FileText className="h-5 w-5" /> },
+    { name: "Subsidies", href: "/gn-officer/subsidies", icon: <Gift className="h-5 w-5" /> },
+    { name: "Events", href: "/gn-officer/events", icon: <Calendar className="h-5 w-5" /> },
     { name: nav("notices"), href: "/gn-officer/notices", icon: <Bell className="h-5 w-5" /> },
     { name: "Grievances", href: "/gn-officer/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
     { name: nav("settings"), href: "/gn-officer/settings", icon: <Settings className="h-5 w-5" /> },
@@ -120,6 +136,8 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("dashboard"), href: "/resident", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("myHousehold"), href: "/resident/household", icon: <Home className="h-5 w-5" /> },
     { name: nav("certificates"), href: "/resident/requests", icon: <FileText className="h-5 w-5" /> },
+    { name: "Subsidies", href: "/resident/subsidies", icon: <Gift className="h-5 w-5" /> },
+    { name: "Events", href: "/resident/events", icon: <Calendar className="h-5 w-5" /> },
     { name: nav("notices"), href: "/resident/notices", icon: <Bell className="h-5 w-5" /> },
     { name: "Grievances", href: "/resident/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
   ];
@@ -181,7 +199,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
           </Button>
           <div className="flex flex-1 items-center justify-end gap-4">
              <div className="hidden sm:block text-right">
-                <p className="text-sm font-medium leading-none text-[#003366] dark:text-blue-400">{user.name}</p>
+                <p className="text-sm font-medium leading-none text-[#003366] dark:text-blue-400">{currentUser.name}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   {roleLabel}
                 </p>
@@ -191,7 +209,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
                 <Button variant="secondary" size="icon" className="rounded-full shadow-sm dark:bg-slate-800 dark:hover:bg-slate-700">
                   <Avatar className="h-9 w-9">
                     <AvatarFallback className="bg-[#003366] dark:bg-blue-600 text-white">
-                      {user.name.substring(0, 2).toUpperCase()}
+                      {currentUser.name.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <span className="sr-only">{common("toggleUserMenu")}</span>
