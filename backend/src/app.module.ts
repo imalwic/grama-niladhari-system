@@ -17,6 +17,8 @@ import { SystemAdminModule } from './system-admin/system-admin.module';
 import { AuditModule } from './audit/audit.module';
 import { GrievancesModule } from './grievances/grievances.module';
 import { DocumentsModule } from './documents/documents.module';
+import { SubsidiesModule } from './subsidies/subsidies.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { DocumentsModule } from './documents/documents.module';
     AuditModule,
     GrievancesModule,
     DocumentsModule,
+    SubsidiesModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

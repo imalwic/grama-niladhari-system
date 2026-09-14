@@ -65,6 +65,8 @@ model Wasama {
   officers   User[] // GN Officers assigned to this Wasama
   households Household[]
   notices    Notice[]
+  subsidyPrograms SubsidyProgram[]
+  events     CommunityEvent[]
 }
 
 model User {
@@ -104,6 +106,7 @@ model Household {
   updatedAt   DateTime @updatedAt
 
   residents Resident[]
+  subsidyApplications SubsidyApplication[]
 
   @@unique([houseNumber, wasamaId])
 }
@@ -134,6 +137,7 @@ model Resident {
   categoryTags ResidentCategory[]
   requests     Request[]
   grievances   Grievance[]
+  rsvps        EventRSVP[]
 }
 
 model Category {
@@ -267,4 +271,56 @@ model DocumentPradeshiyaSabha {
   pradeshiyaSabha   PradeshiyaSabha @relation(fields: [pradeshiyaSabhaId], references: [id])
 
   @@id([documentId, pradeshiyaSabhaId])
+}
+
+model SubsidyProgram {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  amount      Float?
+  isActive    Boolean  @default(true)
+  wasamaId    String
+  wasama      Wasama   @relation(fields: [wasamaId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  applications SubsidyApplication[]
+}
+
+model SubsidyApplication {
+  id           String         @id @default(uuid())
+  programId    String
+  program      SubsidyProgram @relation(fields: [programId], references: [id])
+  householdId  String
+  household    Household      @relation(fields: [householdId], references: [id])
+  status       String         @default("PENDING") // PENDING, APPROVED, REJECTED
+  appliedAt    DateTime       @default(now())
+  reviewedAt   DateTime?
+
+  @@unique([programId, householdId])
+}
+
+model CommunityEvent {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  eventDate   DateTime
+  location    String
+  wasamaId    String
+  wasama      Wasama   @relation(fields: [wasamaId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rsvps EventRSVP[]
+}
+
+model EventRSVP {
+  eventId    String
+  event      CommunityEvent @relation(fields: [eventId], references: [id])
+  residentId String
+  resident   Resident       @relation(fields: [residentId], references: [id])
+  status     String         @default("GOING") // GOING, MAYBE, DECLINED
+  createdAt  DateTime       @default(now())
+
+  @@id([eventId, residentId])
 }
