@@ -96,11 +96,13 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("overview"), href: "/system-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("pradeshiyaSabhas"), href: "/system-admin/pradeshiya-sabhas", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: "Grievances", href: "/system-admin/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
+    { name: "Shared Docs", href: "/system-admin/documents", icon: <FileText className="h-5 w-5" /> },
   ];
 
   const psAdminNav: SidebarItem[] = [
     { name: nav("overview"), href: "/ps-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("gnOfficers"), href: "/ps-admin/gn-officers", icon: <Users className="h-5 w-5" /> },
+    { name: "Shared Docs", href: "/ps-admin/documents", icon: <FileText className="h-5 w-5" /> },
     { name: nav("settings"), href: "/ps-admin/settings", icon: <Settings className="h-5 w-5" /> },
   ];
 

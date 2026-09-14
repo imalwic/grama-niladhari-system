@@ -16,6 +16,7 @@ import { AdminModule } from './admin/admin.module';
 import { SystemAdminModule } from './system-admin/system-admin.module';
 import { AuditModule } from './audit/audit.module';
 import { GrievancesModule } from './grievances/grievances.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { GrievancesModule } from './grievances/grievances.module';
     SystemAdminModule,
     AuditModule,
     GrievancesModule,
+    DocumentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
