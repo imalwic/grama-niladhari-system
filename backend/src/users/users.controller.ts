@@ -30,4 +30,19 @@ export class UsersController {
     if (!req.user.pradeshiyaSabhaId) throw new UnauthorizedException('Super admin is not assigned to a Pradeshiya Sabha');
     return this.usersService.deleteGnOfficer(id, req.user.pradeshiyaSabhaId);
   }
+
+  @Get('me')
+  getProfile(@Request() req: any) {
+    return this.usersService.getProfile(req.user.userId);
+  }
+
+  @Patch('me')
+  updateProfile(@Body() body: any, @Request() req: any) {
+    return this.usersService.updateProfile(req.user.userId, body);
+  }
+
+  @Patch('me/password')
+  updatePassword(@Body() body: any, @Request() req: any) {
+    return this.usersService.updatePassword(req.user.userId, body);
+  }
 }
