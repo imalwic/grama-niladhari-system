@@ -47,6 +47,26 @@ export default function HouseholdsManagement() {
     }
   };
 
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this household?")) return;
+    try {
+      const res = await fetch(`http://localhost:3001/households/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        fetchHouseholds();
+      } else {
+        const data = await res.json();
+        alert(data.message || "Failed to delete household");
+      }
+    } catch (error) {
+      console.error("Failed to delete household:", error);
+      alert("An error occurred while deleting");
+    }
+  };
+
   const handleCreateHousehold = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
@@ -185,10 +205,7 @@ export default function HouseholdsManagement() {
                 <TableCell>{household.address}</TableCell>
                 <TableCell>{household.residents?.length || 0} {t("members")}</TableCell>
                 <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950">
+                  <Button variant="ghost" size="icon" onClick={(e) => handleDelete(household.id, e)} className="h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950" title="Delete Household">
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>
