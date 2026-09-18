@@ -19,6 +19,7 @@ import { GrievancesModule } from './grievances/grievances.module';
 import { DocumentsModule } from './documents/documents.module';
 import { SubsidiesModule } from './subsidies/subsidies.module';
 import { EventsModule } from './events/events.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { EventsModule } from './events/events.module';
     DocumentsModule,
     SubsidiesModule,
     EventsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
