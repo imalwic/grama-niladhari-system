@@ -189,7 +189,6 @@ export default function ResidentRegistration() {
             width={60}
             height={60}
             priority
-            style={{ width: "auto", height: "auto" }}
             className="mb-2"
           />
           <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">
