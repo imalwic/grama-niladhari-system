@@ -96,6 +96,25 @@ export default function ResidentsManagement() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this resident?")) return;
+    try {
+      const res = await fetch(`http://localhost:3001/residents/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        fetchResidents();
+      } else {
+        const data = await res.json();
+        alert(data.message || "Failed to delete resident");
+      }
+    } catch (error) {
+      console.error("Failed to delete resident:", error);
+      alert("An error occurred while deleting");
+    }
+  };
+
   const filteredResidents = residents.filter((r) =>
     (r.fullName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     (r.nic || "").includes(searchTerm) ||
@@ -269,10 +288,7 @@ export default function ResidentsManagement() {
                        <ShieldCheck className="h-4 w-4" />
                      </Button>
                   )}
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950">
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(resident.id)} className="h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950" title="Delete Resident">
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>
