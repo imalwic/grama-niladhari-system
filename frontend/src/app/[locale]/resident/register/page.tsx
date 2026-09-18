@@ -267,7 +267,7 @@ export default function ResidentRegistration() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="gender">{t("gender")}</Label>
-                  <Select value={gender} onValueChange={setGender} required>
+                  <Select value={gender} onValueChange={(val) => setGender(val || "")} required>
                     <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
@@ -280,7 +280,7 @@ export default function ResidentRegistration() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="maritalStatus">{t("maritalStatus")}</Label>
-                  <Select value={maritalStatus} onValueChange={setMaritalStatus} required>
+                  <Select value={maritalStatus} onValueChange={(val) => setMaritalStatus(val || "")} required>
                     <SelectTrigger className="dark:bg-slate-800 dark:border-slate-700">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
