@@ -116,7 +116,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("overview"), href: "/ps-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("gnOfficers"), href: "/ps-admin/gn-officers", icon: <Users className="h-5 w-5" /> },
     { name: "Shared Docs", href: "/ps-admin/documents", icon: <FileText className="h-5 w-5" /> },
-    { name: nav("settings"), href: "/ps-admin/settings", icon: <Settings className="h-5 w-5" /> },
+    { name: "Reports", href: "/ps-admin/reports", icon: <FileText className="h-5 w-5" /> },
   ];
 
   const gnOfficerNav: SidebarItem[] = [
@@ -128,6 +128,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: "Subsidies", href: "/gn-officer/subsidies", icon: <Gift className="h-5 w-5" /> },
     { name: "Events", href: "/gn-officer/events", icon: <Calendar className="h-5 w-5" /> },
     { name: nav("notices"), href: "/gn-officer/notices", icon: <Bell className="h-5 w-5" /> },
+    { name: "PS Reports", href: "/gn-officer/reports", icon: <FileText className="h-5 w-5" /> },
     { name: "Grievances", href: "/gn-officer/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
     { name: nav("settings"), href: "/gn-officer/settings", icon: <Settings className="h-5 w-5" /> },
   ];
