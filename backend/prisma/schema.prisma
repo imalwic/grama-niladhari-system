@@ -67,6 +67,7 @@ model Wasama {
   notices    Notice[]
   subsidyPrograms SubsidyProgram[]
   events     CommunityEvent[]
+  reportRequests ReportRequest[]
 }
 
 model User {
@@ -92,6 +93,8 @@ model User {
   notifications AppNotification[]
   supportTickets SupportTicket[]
   auditLogs      AuditLog[]
+  requestedReports ReportRequest[] @relation("PSAdminRequests")
+  reviewedReports  ReportRequest[] @relation("GNReportReviews")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -330,4 +333,19 @@ model EventRSVP {
   createdAt  DateTime       @default(now())
 
   @@id([eventId, residentId])
+}
+
+model ReportRequest {
+  id            String        @id @default(uuid())
+  wasamaId      String
+  wasama        Wasama        @relation(fields: [wasamaId], references: [id])
+  requestedById String
+  requestedBy   User          @relation("PSAdminRequests", fields: [requestedById], references: [id])
+  status        RequestStatus @default(PENDING) // PENDING, APPROVED, REJECTED
+  reportType    String        @default("FULL_FAMILY_REPORT")
+  pdfUrl        String?
+  reviewedById  String?
+  reviewedBy    User?         @relation("GNReportReviews", fields: [reviewedById], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
