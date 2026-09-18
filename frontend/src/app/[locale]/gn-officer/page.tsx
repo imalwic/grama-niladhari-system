@@ -2,12 +2,39 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Home, FileText, CheckCircle, UserCheck, Download } from "lucide-react";
+import { Users, Home, FileText, CheckCircle, UserCheck, Download, ChevronRight, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a29bfe', '#fd79a8'];
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
+// Reusable animated StatCard
+const StatCard = ({ title, value, icon: Icon, desc, color }: any) => {
+  const colorMap: Record<string, string> = {
+    blue: "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400",
+    emerald: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400",
+    orange: "bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400",
+    green: "bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400",
+    indigo: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400",
+  };
+
+  return (
+    <Card className="relative overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-slate-900 group">
+      <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full opacity-10 transition-transform duration-500 group-hover:scale-150 ${colorMap[color].split(' ')[0]}`} />
+      <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
+        <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">{title}</CardTitle>
+        <div className={`p-2 rounded-lg ${colorMap[color]}`}>
+          <Icon className="h-4 w-4" />
+        </div>
+      </CardHeader>
+      <CardContent className="relative z-10">
+        <div className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">{value}</div>
+        {desc && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{desc}</p>}
+      </CardContent>
+    </Card>
+  );
+};
 
 export default function GnOfficerDashboard() {
   const t = useTranslations("GnOfficer");
@@ -69,173 +96,152 @@ export default function GnOfficerDashboard() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("title")}</h1>
-          <p className="text-muted-foreground">
+    <div className="flex flex-col gap-8 pb-10">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-100 to-transparent dark:from-blue-900/20 dark:to-transparent rounded-full -mr-20 -mt-20 opacity-50 pointer-events-none" />
+        <div className="flex flex-col gap-2 relative z-10">
+          <div className="flex items-center gap-2">
+            <Activity className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">{t("title")}</h1>
+          </div>
+          <p className="text-slate-500 dark:text-slate-400 max-w-lg leading-relaxed">
             {subtitle || t("subtitle")}
           </p>
         </div>
-        <Button onClick={handleDownloadReport} variant="outline" className="border-[#003366] text-[#003366] hover:bg-blue-50 dark:border-blue-500 dark:text-blue-400 dark:hover:bg-slate-800">
+        <Button onClick={handleDownloadReport} className="relative z-10 bg-white text-blue-600 border border-blue-200 hover:bg-blue-50 hover:border-blue-300 dark:bg-slate-800 dark:text-blue-400 dark:border-slate-700 dark:hover:bg-slate-700 shadow-sm transition-all">
           <Download className="w-4 h-4 mr-2" /> Download Report
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t("myResidents")}</CardTitle>
-            <Users className="h-4 w-4 text-[#003366] dark:text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalResidents}</div>
-            <p className="text-xs text-muted-foreground">{t("addedThisWeek")}</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t("households")}</CardTitle>
-            <Home className="h-4 w-4 text-[#003366] dark:text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalHouseholds}</div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t("pendingRequests")}</CardTitle>
-            <FileText className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats.pendingRequests}</div>
-            <p className="text-xs text-muted-foreground">{t("needsApproval")}</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t("certificatesIssued")}</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.issuedCertificates}</div>
-            <p className="text-xs text-muted-foreground">{t("thisYear")}</p>
-          </CardContent>
-        </Card>
+      {/* Stats Grid */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+        <StatCard title={t("myResidents")} value={stats.totalResidents} icon={Users} desc={t("addedThisWeek")} color="blue" />
+        <StatCard title={t("households")} value={stats.totalHouseholds} icon={Home} color="emerald" />
+        <StatCard title={t("pendingRequests")} value={stats.pendingRequests} icon={FileText} desc={t("needsApproval")} color="orange" />
+        <StatCard title={t("certificatesIssued")} value={stats.issuedCertificates} icon={CheckCircle} desc={t("thisYear")} color="green" />
+        <StatCard title="Eligible Voters" value={stats.newVoters} icon={UserCheck} desc="18+ in your Wasama" color="indigo" />
       </div>
 
-      {/* New Row for Electoral Register & Analytics */}
-      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3 mt-4">
-        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-blue-50/50 dark:bg-blue-900/10">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">New Eligible Voters (18+)</CardTitle>
-            <UserCheck className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.newVoters}</div>
-            <p className="text-xs text-muted-foreground mt-1">Within your Wasama</p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 col-span-1 lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Demographics Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col md:flex-row items-center justify-around gap-4 h-64">
-            {stats.ageDemographics && stats.ageDemographics.length > 0 && (
-              <div className="w-full md:w-1/2 h-full">
-                <p className="text-sm text-center font-medium mb-2">Age Distribution</p>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={stats.ageDemographics}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={40}
-                      outerRadius={70}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {stats.ageDemographics.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
+      {/* Demographics Row */}
+      <Card className="border-0 shadow-md bg-white dark:bg-slate-900 overflow-hidden">
+        <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 pb-4">
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <Users className="h-5 w-5 text-blue-500" />
+            Demographics Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="flex flex-col lg:flex-row items-center justify-around gap-12 h-[350px]">
+            {stats.ageDemographics && stats.ageDemographics.length > 0 ? (
+              <div className="w-full lg:w-1/2 h-full flex flex-col items-center">
+                <p className="text-sm text-slate-500 font-medium mb-4">Age Distribution</p>
+                <div className="w-full h-full min-h-[250px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={stats.ageDemographics}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={4}
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {stats.ageDemographics.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                      <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
+            ) : (
+              <div className="w-full lg:w-1/2 h-full flex items-center justify-center text-slate-400">No age data available</div>
             )}
             
-            {stats.relationships && stats.relationships.length > 0 && (
-              <div className="w-full md:w-1/2 h-full">
-                <p className="text-sm text-center font-medium mb-2">Household Relationships</p>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={stats.relationships}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={40}
-                      outerRadius={70}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {stats.relationships.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
+            {stats.relationships && stats.relationships.length > 0 ? (
+              <div className="w-full lg:w-1/2 h-full flex flex-col items-center">
+                <p className="text-sm text-slate-500 font-medium mb-4">Household Relationships</p>
+                <div className="w-full h-full min-h-[250px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={stats.relationships}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={4}
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {stats.relationships.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                      <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
+            ) : (
+              <div className="w-full lg:w-1/2 h-full flex items-center justify-center text-slate-400">No relationship data available</div>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Bottom Row */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="border-0 shadow-sm hover:shadow-md transition-shadow dark:bg-slate-900">
+          <CardHeader>
+            <CardTitle className="text-lg">{t("quickActions")}</CardTitle>
+            <CardDescription>{t("frequentTasks")}</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3">
+            <Button className="w-full justify-between bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-12 px-4 rounded-xl">
+              <span className="flex items-center"><Home className="w-4 h-4 mr-2" /> {t("registerHousehold")}</span>
+              <ChevronRight className="w-4 h-4 opacity-70" />
+            </Button>
+            <Button className="w-full justify-between bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm h-12 px-4 rounded-xl">
+              <span className="flex items-center"><Users className="w-4 h-4 mr-2" /> {t("addResident")}</span>
+              <ChevronRight className="w-4 h-4 opacity-70" />
+            </Button>
+            <Button variant="outline" className="w-full justify-between h-12 px-4 rounded-xl border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50">
+              <span className="flex items-center"><FileText className="w-4 h-4 mr-2" /> {t("publishNotice")}</span>
+              <ChevronRight className="w-4 h-4 opacity-70" />
+            </Button>
           </CardContent>
         </Card>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mt-4">
-         <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
+        <Card className="border-0 shadow-sm hover:shadow-md transition-shadow dark:bg-slate-900 flex flex-col">
           <CardHeader>
-            <CardTitle>{t("quickActions")}</CardTitle>
-            <CardDescription>
-              {t("frequentTasks")}
-            </CardDescription>
+            <CardTitle className="text-lg">{t("recentRequests")}</CardTitle>
+            <CardDescription>{t("requestsWaiting")}</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4">
-             <Button className="w-full justify-start bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
-               {t("registerHousehold")}
-             </Button>
-             <Button className="w-full justify-start bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
-               {t("addResident")}
-             </Button>
-             <Button variant="outline" className="w-full justify-start dark:border-slate-700 dark:text-slate-300">
-               {t("publishNotice")}
-             </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
-          <CardHeader>
-            <CardTitle>{t("recentRequests")}</CardTitle>
-            <CardDescription>
-              {t("requestsWaiting")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-               {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between border-b dark:border-slate-700 pb-2 last:border-0">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {t("characterCertReq")}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("requestedBy")}
-                    </p>
+          <CardContent className="flex-1 flex flex-col">
+            <div className="space-y-3 flex-1">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-800/20 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 p-1.5 rounded-full bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-medium leading-none text-slate-900 dark:text-slate-100">
+                        {t("characterCertReq")}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {t("requestedBy")}
+                      </p>
+                    </div>
                   </div>
-                  <Button size="sm" variant="outline" className="h-8 dark:border-slate-700">{t("review")}</Button>
+                  <Button size="sm" variant="ghost" className="h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20">{t("review")}</Button>
                 </div>
               ))}
             </div>
