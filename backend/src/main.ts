@@ -8,7 +8,7 @@ async function bootstrap() {
   app.enableCors(); // Enable CORS for local dev
   
   // Serve static files from the uploads directory
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads/',
   });
 
