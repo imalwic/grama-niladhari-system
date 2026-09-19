@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Search } from "lucide-react";
 
 export default function PsAdminsPage() {
-  const t = useTranslations("Common");
+  const t = useTranslations("SuperAdmin");
   const [data, setData] = useState<any[]>([]);
   const [search, setSearch] = useState("");
 
@@ -24,7 +24,7 @@ export default function PsAdminsPage() {
           setData(await res.json());
         }
       } catch (err) {
-        console.error("Failed to fetch PS Admins", err);
+        console.error("Failed to fetch {t("pradeshiyaSabhasTitle")}", err);
       }
     };
     fetchData();
@@ -40,22 +40,22 @@ export default function PsAdminsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">PS Admins</h1>
-          <p className="text-muted-foreground">Manage Pradeshiya Sabha Administrators</p>
+          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("pradeshiyaSabhasTitle")}</h1>
+          <p className="text-muted-foreground">{t("managePsAdminsDesc")}</p>
         </div>
         <Button className="bg-[#003366] hover:bg-[#002244] text-white">
-          <Plus className="mr-2 h-4 w-4" /> Add PS Admin
+          <Plus className="mr-2 h-4 w-4" /> {t("addPsAdminBtn")}
         </Button>
       </div>
 
       <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
         <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <CardTitle>Directory</CardTitle>
-            <div className="relative w-64">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle>{t("directoryTitle")}</CardTitle>
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search..."
+                placeholder={t("searchPlaceholder")}
                 className="pl-8"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -68,11 +68,11 @@ export default function PsAdminsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>NIC</TableHead>
-                  <TableHead>Pradeshiya Sabha</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t("nameCol")}</TableHead>
+                  <TableHead>{t("emailCol")}</TableHead>
+                  <TableHead>{t("nicCol")}</TableHead>
+                  <TableHead>{t("pradeshiyaSabhaCol")}</TableHead>
+                  <TableHead>{t("actionsCol")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -83,14 +83,14 @@ export default function PsAdminsPage() {
                     <TableCell>{admin.nic}</TableCell>
                     <TableCell>{admin.pradeshiyaSabha?.name || "N/A"}</TableCell>
                     <TableCell>
-                      <Button variant="outline" size="sm">View</Button>
+                      <Button variant="outline" size="sm">{t("viewBtn")}</Button>
                     </TableCell>
                   </TableRow>
                 ))}
                 {filteredData.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                      No PS Admins found.
+                      No {t("pradeshiyaSabhasTitle")} found.
                     </TableCell>
                   </TableRow>
                 )}
