@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 import { Search, UserCheck } from "lucide-react";
 
 export default function VotersRegistry() {
+  const t = useTranslations("GNOfficer");
   const [searchTerm, setSearchTerm] = useState("");
   const [voters, setVoters] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,9 +47,9 @@ export default function VotersRegistry() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[#003366] dark:text-blue-400 flex items-center gap-2">
             <UserCheck className="h-6 w-6" />
-            Electoral Register (Voters List)
+            {t("electoralRegisterTitle")}
           </h1>
-          <p className="text-muted-foreground">Manage and review eligible voters (18+ years) in your division.</p>
+          <p className="text-muted-foreground">{t("manageVotersDesc")}</p>
         </div>
       </div>
 
@@ -55,7 +57,7 @@ export default function VotersRegistry() {
         <div className="relative w-full">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search voters by name, NIC, or Household No..."
+            placeholder={t("searchVotersPlaceholder")}
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -67,18 +69,18 @@ export default function VotersRegistry() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Full Name</TableHead>
-              <TableHead>National ID (NIC)</TableHead>
-              <TableHead>Age</TableHead>
-              <TableHead>Household No</TableHead>
-              <TableHead>Verification Status</TableHead>
+              <TableHead>{t("fullNameCol")}</TableHead>
+              <TableHead>{t("nationalIdCol")}</TableHead>
+              <TableHead>{t("ageCol")}</TableHead>
+              <TableHead>{t("householdNoCol")}</TableHead>
+              <TableHead>{t("verificationStatusCol")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  Loading voters...
+                  {t("loadingVoters")}
                 </TableCell>
               </TableRow>
             ) : filteredVoters.map((voter) => {
@@ -88,14 +90,14 @@ export default function VotersRegistry() {
                 <TableRow key={voter.id}>
                   <TableCell className="font-medium">{voter.fullName}</TableCell>
                   <TableCell>{voter.nic || "N/A"}</TableCell>
-                  <TableCell>{age} Years</TableCell>
+                  <TableCell>{age} {t("yearsSuffix")}</TableCell>
                   <TableCell className="font-mono">{voter.household?.houseNumber || "Pending"}</TableCell>
                   <TableCell>
                     <Badge 
                       variant={voter.isVerified ? "default" : "secondary"} 
                       className={voter.isVerified ? "bg-green-600" : "bg-orange-500"}
                     >
-                      {voter.isVerified ? "Verified" : "Pending"}
+                      {voter.isVerified ? t("verifiedStatus") : t("pendingStatus")}
                     </Badge>
                   </TableCell>
                 </TableRow>
@@ -104,7 +106,7 @@ export default function VotersRegistry() {
             {!isLoading && filteredVoters.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  No eligible voters found.
+                  {t("noVotersFound")}
                 </TableCell>
               </TableRow>
             )}

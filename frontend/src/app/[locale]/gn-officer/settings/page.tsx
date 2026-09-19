@@ -19,6 +19,7 @@ function getAuthHeaders() {
 export default function GnOfficerSettings() {
   const t = useTranslations("Navigation");
   const c = useTranslations("Common");
+  const tGN = useTranslations("GNOfficer");
 
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -115,7 +116,7 @@ export default function GnOfficerSettings() {
           {t("settings")}
         </h1>
         <p className="text-muted-foreground mt-2">
-          Manage your account settings and preferences.
+          {tGN("manageSettingsDesc")}
         </p>
       </div>
 
@@ -123,25 +124,25 @@ export default function GnOfficerSettings() {
         <Card>
           <form onSubmit={handleUpdateProfile}>
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your personal details here.</CardDescription>
+              <CardTitle>{tGN("profileInfoTitle")}</CardTitle>
+              <CardDescription>{tGN("updatePersonalDetailsDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{tGN("fullNameLabel")}</Label>
                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">{tGN("emailAddressLabel")}</Label>
                 <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">{tGN("phoneNumberLabel")}</Label>
                 <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
               </div>
               <Button type="submit" disabled={savingProfile} className="w-full sm:w-auto mt-4 bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
                 {savingProfile ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} 
-                Save Changes
+                {tGN("saveChangesBtn")}
               </Button>
             </CardContent>
           </form>
@@ -150,25 +151,25 @@ export default function GnOfficerSettings() {
         <Card>
           <form onSubmit={handleUpdatePassword}>
             <CardHeader>
-              <CardTitle>Security</CardTitle>
-              <CardDescription>Update your password and security preferences.</CardDescription>
+              <CardTitle>{tGN("securityTitle")}</CardTitle>
+              <CardDescription>{tGN("updatePasswordDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
+                <Label htmlFor="current-password">{tGN("currentPasswordLabel")}</Label>
                 <Input id="current-password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
+                <Label htmlFor="new-password">{tGN("newPasswordLabel")}</Label>
                 <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Label htmlFor="confirm-password">{tGN("confirmPasswordLabel")}</Label>
                 <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
               </div>
               <Button type="submit" disabled={savingPassword} className="w-full sm:w-auto mt-4 bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
                 {savingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                Update Password
+                {tGN("updatePasswordBtn")}
               </Button>
             </CardContent>
           </form>

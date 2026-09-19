@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 import { Gift, Plus, CheckCircle2, XCircle } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -19,6 +20,7 @@ function getAuthHeaders() {
 }
 
 export default function GnOfficerSubsidies() {
+  const t = useTranslations("GNOfficer");
   const [programs, setPrograms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -111,38 +113,38 @@ export default function GnOfficerSubsidies() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[#003366] dark:text-blue-400 flex items-center gap-2">
-            <Gift className="h-6 w-6" /> Subsidies Programs
+            <Gift className="h-6 w-6" /> {t("subsidiesProgramsTitle")}
           </h1>
-          <p className="text-muted-foreground">Manage relief and subsidy programs for your division.</p>
+          <p className="text-muted-foreground">{t("manageReliefDesc")}</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger render={
             <Button className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
-              <Plus className="mr-2 h-4 w-4" /> New Program
+              <Plus className="mr-2 h-4 w-4" /> {t("newProgramBtn")}
             </Button>
           } />
           <DialogContent>
             <form onSubmit={handleCreateProgram}>
               <DialogHeader>
-                <DialogTitle>Create Subsidy Program</DialogTitle>
-                <DialogDescription>Add a new government relief or subsidy program.</DialogDescription>
+                <DialogTitle>{t("createSubsidyProgTitle")}</DialogTitle>
+                <DialogDescription>{t("addGovReliefDesc")}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label>Program Name</Label>
-                  <Input required value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Samurdhi, Fertilizer Subsidy" />
+                  <Label>{t("programNameLabel")}</Label>
+                  <Input required value={name} onChange={e => setName(e.target.value)} placeholder={t("programNamePlaceholder")} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Description</Label>
+                  <Label>{t("descriptionLabel")}</Label>
                   <Textarea required value={description} onChange={e => setDescription(e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Amount (LKR) - Optional</Label>
+                  <Label>{t("amountLabel")}</Label>
                   <Input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="5000" />
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={submitting}>Create Program</Button>
+                <Button type="submit" disabled={submitting}>{t("createProgramBtn")}</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -156,7 +158,7 @@ export default function GnOfficerSubsidies() {
               <div className="flex justify-between items-start mb-2">
                 <h3 className="font-bold text-lg">{program.name}</h3>
                 <Badge variant={program.isActive ? "default" : "secondary"}>
-                  {program.isActive ? "Active" : "Closed"}
+                  {program.isActive ? t("activeStatus") : t("closedStatus")}
                 </Badge>
               </div>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{program.description}</p>
@@ -166,20 +168,20 @@ export default function GnOfficerSubsidies() {
             <Dialog>
               <DialogTrigger render={
                 <Button variant="outline" className="w-full mt-4" onClick={() => loadApplications(program)}>
-                  View Applications ({program._count?.applications || 0})
+                  {t("viewAppsBtn")} ({program._count?.applications || 0})
                 </Button>
               } />
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto">
                 <DialogHeader>
-                  <DialogTitle>{program.name} Applications</DialogTitle>
+                  <DialogTitle>{program.name} {t("applicationsTitle")}</DialogTitle>
                 </DialogHeader>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Household No</TableHead>
-                      <TableHead>Applied Date</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>{t("householdNoCol")}</TableHead>
+                      <TableHead>{t("appliedDateCol")}</TableHead>
+                      <TableHead>{t("statusCol")}</TableHead>
+                      <TableHead className="text-right">{t("actionsCol")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -199,10 +201,10 @@ export default function GnOfficerSubsidies() {
                           {app.status === 'PENDING' && (
                             <div className="flex justify-end gap-2">
                               <Button size="sm" variant="outline" className="text-red-600 hover:bg-red-50" onClick={() => handleUpdateStatus(app.id, 'REJECTED')}>
-                                Reject
+                                {t("rejectBtn")}
                               </Button>
                               <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => handleUpdateStatus(app.id, 'APPROVED')}>
-                                Approve
+                                {t("approveBtn")}
                               </Button>
                             </div>
                           )}
@@ -211,7 +213,7 @@ export default function GnOfficerSubsidies() {
                     ))}
                     {applications.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">No applications yet.</TableCell>
+                        <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">{t("noAppsFound")}</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -222,7 +224,7 @@ export default function GnOfficerSubsidies() {
         ))}
         {!loading && programs.length === 0 && (
           <div className="col-span-full p-8 text-center border border-dashed rounded-lg text-muted-foreground">
-            No subsidy programs created yet.
+            {t("noSubsidiesFound")}
           </div>
         )}
       </div>
