@@ -131,10 +131,10 @@ export default function GnOfficerDashboard() {
             Demographics Overview
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row items-center justify-around gap-12 h-[350px]">
+        <CardContent className="p-4 md:p-6">
+          <div className="flex flex-col lg:flex-row items-center justify-around gap-8 md:gap-12 min-h-[350px] lg:h-[350px]">
             {stats.ageDemographics && stats.ageDemographics.length > 0 ? (
-              <div className="w-full lg:w-1/2 h-full flex flex-col items-center">
+              <div className="w-full lg:w-1/2 h-[250px] lg:h-full flex flex-col items-center">
                 <p className="text-sm text-slate-500 font-medium mb-4">Age Distribution</p>
                 <div className="w-full h-full min-h-[250px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -164,7 +164,7 @@ export default function GnOfficerDashboard() {
             )}
             
             {stats.relationships && stats.relationships.length > 0 ? (
-              <div className="w-full lg:w-1/2 h-full flex flex-col items-center">
+              <div className="w-full lg:w-1/2 h-[250px] lg:h-full flex flex-col items-center mt-6 lg:mt-0">
                 <p className="text-sm text-slate-500 font-medium mb-4">Household Relationships</p>
                 <div className="w-full h-full min-h-[250px]">
                   <ResponsiveContainer width="100%" height="100%">

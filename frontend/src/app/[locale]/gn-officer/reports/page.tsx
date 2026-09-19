@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 import { CheckCircle2, XCircle, Eye } from "lucide-react";
 
 export default function GNOfficerReportsPage() {
+  const t = useTranslations("GNOfficer");
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState("");
@@ -71,19 +73,19 @@ export default function GNOfficerReportsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-[#003366] dark:text-blue-400">PS Report Requests</h1>
-        <p className="text-muted-foreground">Approve or reject comprehensive household report requests from Pradeshiya Sabha.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("psReportRequestsTitle")}</h1>
+        <p className="text-muted-foreground">{t("approveRejectDesc")}</p>
       </div>
 
       <div className="rounded-md border bg-white dark:bg-slate-900 shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Requested Date</TableHead>
-              <TableHead>Requested By</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Action</TableHead>
+              <TableHead>{t("requestedDateCol")}</TableHead>
+              <TableHead>{t("requestedByCol")}</TableHead>
+              <TableHead>{t("typeCol")}</TableHead>
+              <TableHead>{t("statusCol")}</TableHead>
+              <TableHead className="text-right">{t("actionCol")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -92,7 +94,7 @@ export default function GNOfficerReportsPage() {
                 <TableCell>{new Date(report.createdAt).toLocaleString()}</TableCell>
                 <TableCell>
                   <div className="font-medium">{report.requestedBy?.name}</div>
-                  <div className="text-xs text-muted-foreground">PS Admin</div>
+                  <div className="text-xs text-muted-foreground">{t("psAdminRole")}</div>
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">{report.reportType.replace(/_/g, ' ')}</Badge>
@@ -113,7 +115,7 @@ export default function GNOfficerReportsPage() {
                         disabled={previewingId === report.id || processingId === report.id}
                         onClick={() => handlePreview(report.id)}
                       >
-                        <Eye className="mr-1 h-4 w-4" /> {previewingId === report.id ? "Loading..." : "Preview"}
+                        <Eye className="mr-1 h-4 w-4" /> {previewingId === report.id ? t("loadingBtnText") : t("previewBtn")}
                       </Button>
                       <Button 
                         variant="outline" 
@@ -122,7 +124,7 @@ export default function GNOfficerReportsPage() {
                         disabled={processingId === report.id || previewingId === report.id}
                         onClick={() => handleAction(report.id, 'reject')}
                       >
-                        <XCircle className="mr-1 h-4 w-4" /> Reject
+                        <XCircle className="mr-1 h-4 w-4" /> {t("rejectBtn")}
                       </Button>
                       <Button 
                         size="sm" 
@@ -131,17 +133,17 @@ export default function GNOfficerReportsPage() {
                         onClick={() => handleAction(report.id, 'approve')}
                       >
                         <CheckCircle2 className="mr-1 h-4 w-4" /> 
-                        {processingId === report.id ? "Generating..." : "Approve"}
+                        {processingId === report.id ? t("generatingBtnText") : t("approveBtn")}
                       </Button>
                     </div>
                   )}
                   {report.status === 'APPROVED' && report.pdfUrl && (
                     <Button variant="outline" size="sm" onClick={() => window.open(report.pdfUrl, '_blank')}>
-                      View Sent PDF
+                      {t("viewSentPdfBtn")}
                     </Button>
                   )}
                   {report.status === 'REJECTED' && (
-                    <span className="text-sm text-muted-foreground">No action required</span>
+                    <span className="text-sm text-muted-foreground">{t("noActionReq")}</span>
                   )}
                 </TableCell>
               </TableRow>
@@ -149,7 +151,7 @@ export default function GNOfficerReportsPage() {
             {reports.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  {loading ? "Loading..." : "No report requests found."}
+                  {loading ? t("loadingBtnText") : t("noReportReqsFound")}
                 </TableCell>
               </TableRow>
             )}
