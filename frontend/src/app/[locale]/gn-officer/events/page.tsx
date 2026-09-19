@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 import { Calendar, Plus, MapPin, Clock } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -19,6 +20,7 @@ function getAuthHeaders() {
 }
 
 export default function GnOfficerEvents() {
+  const t = useTranslations("GNOfficer");
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -97,44 +99,44 @@ export default function GnOfficerEvents() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[#003366] dark:text-blue-400 flex items-center gap-2">
-            <Calendar className="h-6 w-6" /> Community Events
+            <Calendar className="h-6 w-6" /> {t("communityEventsTitle")}
           </h1>
-          <p className="text-muted-foreground">Organize and manage public gatherings, shramadana, etc.</p>
+          <p className="text-muted-foreground">{t("organizeEventsDesc")}</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger render={
             <Button className="bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700">
-              <Plus className="mr-2 h-4 w-4" /> Schedule Event
+              <Plus className="mr-2 h-4 w-4" /> {t("scheduleEventBtn")}
             </Button>
           } />
           <DialogContent>
             <form onSubmit={handleCreateEvent}>
               <DialogHeader>
                 <DialogTitle>Schedule Community Event</DialogTitle>
-                <DialogDescription>Add a new event to the community calendar.</DialogDescription>
+                <DialogDescription>{t("addEventDesc")}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label>Event Title</Label>
-                  <Input required value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Dengue Eradication Shramadana" />
+                  <Label>{t("eventTitleLabel")}</Label>
+                  <Input required value={title} onChange={e => setTitle(e.target.value)} placeholder={t("eventTitlePlaceholder")} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Description</Label>
+                  <Label>{t("descriptionLabel")}</Label>
                   <Textarea required value={description} onChange={e => setDescription(e.target.value)} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Date & Time</Label>
+                    <Label>{t("dateTimeLabel")}</Label>
                     <Input type="datetime-local" required value={eventDate} onChange={e => setEventDate(e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Location</Label>
-                    <Input required value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. Community Hall" />
+                    <Label>{t("locationLabel")}</Label>
+                    <Input required value={location} onChange={e => setLocation(e.target.value)} placeholder={t("locationPlaceholder")} />
                   </div>
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={submitting}>Schedule Event</Button>
+                <Button type="submit" disabled={submitting}>{t("scheduleEventBtn")}</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -151,7 +153,7 @@ export default function GnOfficerEvents() {
               <div className="flex justify-between items-start mb-2">
                 <h3 className="font-bold text-lg leading-tight">{evt.title}</h3>
                 <Badge variant={isUpcoming ? "default" : "secondary"} className={isUpcoming ? "bg-blue-600" : ""}>
-                  {isUpcoming ? "Upcoming" : "Past"}
+                  {isUpcoming ? t("upcomingBadge") : t("pastBadge")}
                 </Badge>
               </div>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">{evt.description}</p>
@@ -171,19 +173,19 @@ export default function GnOfficerEvents() {
             <Dialog>
               <DialogTrigger render={
                 <Button variant="outline" className="w-full mt-2" onClick={() => loadRsvps(evt)}>
-                  View RSVPs ({evt._count?.rsvps || 0})
+                  {t("viewRsvpsBtn")} ({evt._count?.rsvps || 0})
                 </Button>
               } />
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto">
                 <DialogHeader>
-                  <DialogTitle>{evt.title} - RSVPs</DialogTitle>
+                  <DialogTitle>{evt.title} - {t("rsvpsTitle")}</DialogTitle>
                 </DialogHeader>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Resident Name</TableHead>
-                      <TableHead>Household No</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>{t("residentNameCol")}</TableHead>
+                      <TableHead>{t("householdNoCol")}</TableHead>
+                      <TableHead>{t("statusCol")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -203,7 +205,7 @@ export default function GnOfficerEvents() {
                     ))}
                     {rsvps.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">No RSVPs yet.</TableCell>
+                        <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">{t("noRsvpsFound")}</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -214,7 +216,7 @@ export default function GnOfficerEvents() {
         )})}
         {!loading && events.length === 0 && (
           <div className="col-span-full p-8 text-center border border-dashed rounded-lg text-muted-foreground">
-            No community events scheduled yet.
+            {t("noEventsFound")}
           </div>
         )}
       </div>

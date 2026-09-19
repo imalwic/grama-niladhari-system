@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useTranslations } from "next-intl";
 import { Search, Eye, AlertCircle, CheckCircle2 } from "lucide-react";
 
 type GrievanceType = {
@@ -22,6 +23,7 @@ type GrievanceType = {
 };
 
 export default function GNGrievancesManagementPage() {
+  const t = useTranslations("GNOfficer");
   const [data, setData] = useState<GrievanceType[]>([]);
   const [search, setSearch] = useState("");
   const [selectedGrievance, setSelectedGrievance] = useState<GrievanceType | null>(null);
@@ -81,12 +83,12 @@ export default function GNGrievancesManagementPage() {
 
       <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
         <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <CardTitle>Grievance Inbox</CardTitle>
-            <div className="relative w-64">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle>{t("grievanceInboxTitleGN")}</CardTitle>
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search subject or ID..."
+                placeholder={t("searchGrievancePlaceholderGN")}
                 className="pl-8"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -99,11 +101,11 @@ export default function GNGrievancesManagementPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
+                  <TableHead>{t("dateColGN")}</TableHead>
                   <TableHead>Resident</TableHead>
-                  <TableHead>Subject</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t("subjectColGN")}</TableHead>
+                  <TableHead>{t("statusColGN")}</TableHead>
+                  <TableHead>{t("actionsColGN")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -128,7 +130,7 @@ export default function GNGrievancesManagementPage() {
                     </TableCell>
                     <TableCell>
                       <Button variant="outline" size="sm" onClick={() => setSelectedGrievance(g)}>
-                        <Eye className="mr-2 h-4 w-4" /> View
+                        <Eye className="mr-2 h-4 w-4" /> {t("viewBtnGN")}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -150,24 +152,24 @@ export default function GNGrievancesManagementPage() {
         {selectedGrievance && (
           <DialogContent className="sm:max-w-[600px] dark:bg-slate-900 dark:border-slate-800">
             <DialogHeader>
-              <DialogTitle className="text-xl">Review Grievance</DialogTitle>
+              <DialogTitle className="text-xl">{t("reviewGrievanceTitleGN")}</DialogTitle>
               <DialogDescription>
-                Submitted on {new Date(selectedGrievance.createdAt).toLocaleString()}
+                {t("submittedOnGN")} {new Date(selectedGrievance.createdAt).toLocaleString()}
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4 text-sm bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
                 <div>
-                  <span className="text-muted-foreground block mb-1">Reported By</span>
+                  <span className="text-muted-foreground block mb-1">{t("reportedByLabelGN")}</span>
                   <span className="font-medium">{selectedGrievance.reportedBy}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground block mb-1">Identity Document</span>
+                  <span className="text-muted-foreground block mb-1">{t("identityDocLabelGN")}</span>
                   <span className="font-medium">{selectedGrievance.identityType}: {selectedGrievance.identityNumber}</span>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-muted-foreground block mb-1">Contact Info</span>
+                  <span className="text-muted-foreground block mb-1">{t("contactInfoLabelGN")}</span>
                   <span className="font-medium">{selectedGrievance.contactInfo || "N/A"}</span>
                 </div>
               </div>
@@ -180,14 +182,14 @@ export default function GNGrievancesManagementPage() {
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2">Detailed Description</h4>
+                <h4 className="font-semibold mb-2">{t("detailedDescLabelGN")}</h4>
                 <div className="text-sm p-4 border rounded-md min-h-[100px] whitespace-pre-wrap dark:border-slate-700">
                   {selectedGrievance.description}
                 </div>
               </div>
 
               <div className="flex items-center justify-between border-t pt-4 dark:border-slate-800">
-                <span className="text-sm font-medium">Update Status:</span>
+                <span className="text-sm font-medium">{t("updateStatusLabelGN")}</span>
                 <div className="flex gap-2">
                   <Button 
                     size="sm" 
@@ -195,7 +197,7 @@ export default function GNGrievancesManagementPage() {
                     className={selectedGrievance.status === 'INVESTIGATING' ? 'bg-amber-600 hover:bg-amber-700' : ''}
                     onClick={() => updateStatus(selectedGrievance.id, 'INVESTIGATING')}
                   >
-                    <AlertCircle className="mr-2 h-4 w-4" /> Investigating
+                    <AlertCircle className="mr-2 h-4 w-4" /> {t("investigatingBtnGN")}
                   </Button>
                   <Button 
                     size="sm" 
@@ -203,7 +205,7 @@ export default function GNGrievancesManagementPage() {
                     className={selectedGrievance.status === 'RESOLVED' ? 'bg-green-600 hover:bg-green-700' : ''}
                     onClick={() => updateStatus(selectedGrievance.id, 'RESOLVED')}
                   >
-                    <CheckCircle2 className="mr-2 h-4 w-4" /> Resolved
+                    <CheckCircle2 className="mr-2 h-4 w-4" /> {t("resolvedBtnGN")}
                   </Button>
                 </div>
               </div>
