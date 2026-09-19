@@ -15,6 +15,7 @@ function getAuthHeaders() {
 
 export default function MyHouseholdPage() {
   const t = useTranslations("Navigation");
+  const tR = useTranslations("Resident");
   const common = useTranslations("Common");
   
   const [household, setHousehold] = useState<any>(null);
@@ -46,7 +47,7 @@ export default function MyHouseholdPage() {
           {t("myHousehold")}
         </h1>
         <p className="text-slate-500 dark:text-slate-400 mt-2">
-          View your registered household details and members.
+          {tR("viewHouseholdDesc")}
         </p>
       </div>
 
@@ -62,17 +63,17 @@ export default function MyHouseholdPage() {
                 <Home className="h-6 w-6 text-[#003366] dark:text-blue-400" />
               </div>
               <div>
-                <CardTitle>Household Information</CardTitle>
-                <CardDescription>Primary details</CardDescription>
+                <CardTitle>{tR("householdInfoTitle")}</CardTitle>
+                <CardDescription>{tR("primaryDetails")}</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="space-y-4 pt-4 border-t dark:border-slate-800">
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="font-medium text-slate-500 dark:text-slate-400">Household No:</div>
+                <div className="font-medium text-slate-500 dark:text-slate-400">{tR("householdNoLabel")}</div>
                 <div className="font-semibold text-slate-900 dark:text-white">{household.houseNumber}</div>
-                <div className="font-medium text-slate-500 dark:text-slate-400">GN Division:</div>
+                <div className="font-medium text-slate-500 dark:text-slate-400">{tR("gnDivisionLabel")}</div>
                 <div className="font-semibold text-slate-900 dark:text-white">{household.wasama?.name}</div>
-                <div className="font-medium text-slate-500 dark:text-slate-400">Address:</div>
+                <div className="font-medium text-slate-500 dark:text-slate-400">{tR("addressLabel")}</div>
                 <div className="font-semibold text-slate-900 dark:text-white">{household.address || "-"}</div>
               </div>
             </CardContent>
@@ -84,8 +85,8 @@ export default function MyHouseholdPage() {
                 <Users className="h-6 w-6 text-[#003366] dark:text-blue-400" />
               </div>
               <div>
-                <CardTitle>Registered Members</CardTitle>
-                <CardDescription>People living in this household</CardDescription>
+                <CardTitle>{tR("registeredMembersTitle")}</CardTitle>
+                <CardDescription>{tR("peopleLivingDesc")}</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="space-y-4 pt-4 border-t dark:border-slate-800">
@@ -107,7 +108,7 @@ export default function MyHouseholdPage() {
         </div>
       ) : (
         <div className="text-center p-12 text-muted-foreground border rounded-lg bg-white dark:bg-slate-900 dark:border-slate-800">
-           Could not load household details.
+           {tR("couldNotLoadHousehold")}
         </div>
       )}
     </div>

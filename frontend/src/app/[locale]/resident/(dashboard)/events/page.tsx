@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 import { Calendar, MapPin, Clock, CheckCircle2, XCircle, HelpCircle } from "lucide-react";
 import {
   Select,
@@ -21,6 +22,7 @@ function getAuthHeaders() {
 }
 
 export default function ResidentEvents() {
+  const t = useTranslations("Resident");
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [rsvping, setRsvping] = useState<string | null>(null);
@@ -67,9 +69,9 @@ export default function ResidentEvents() {
     <div className="flex flex-col gap-8 max-w-5xl mx-auto w-full">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400 flex items-center gap-2 mb-2">
-          <Calendar className="h-8 w-8" /> Community Events
+          <Calendar className="h-8 w-8" /> {t("communityEventsTitle")}
         </h1>
-        <p className="text-muted-foreground">Stay updated on upcoming community gatherings, shramadana, and meetings.</p>
+        <p className="text-muted-foreground">{t("stayUpdatedDesc")}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -98,7 +100,7 @@ export default function ResidentEvents() {
               
               <div className="p-5 pt-0 border-t border-dashed dark:border-slate-700 mt-4">
                  <div className="pt-4 flex flex-col gap-2">
-                    <span className="text-xs font-semibold uppercase text-slate-500">Your RSVP Status</span>
+                    <span className="text-xs font-semibold uppercase text-slate-500">{t("yourRsvpStatus")}</span>
                     <div className="flex gap-2">
                       <Button 
                         size="sm" 
@@ -107,7 +109,7 @@ export default function ResidentEvents() {
                         onClick={() => handleRsvp(evt.id, 'GOING')}
                         disabled={rsvping === evt.id}
                       >
-                        <CheckCircle2 className="w-4 h-4 mr-1" /> Going
+                        <CheckCircle2 className="w-4 h-4 mr-1" /> {t("goingBtn")}
                       </Button>
                       <Button 
                         size="sm" 
@@ -116,7 +118,7 @@ export default function ResidentEvents() {
                         onClick={() => handleRsvp(evt.id, 'DECLINED')}
                         disabled={rsvping === evt.id}
                       >
-                        <XCircle className="w-4 h-4 mr-1" /> Can't Go
+                        <XCircle className="w-4 h-4 mr-1" /> {t("cantGoBtn")}
                       </Button>
                     </div>
                  </div>
@@ -127,7 +129,7 @@ export default function ResidentEvents() {
         {!loading && events.length === 0 && (
           <div className="col-span-full p-12 text-center border border-dashed rounded-lg text-muted-foreground bg-slate-50 dark:bg-slate-900">
             <Calendar className="w-12 h-12 mx-auto mb-4 text-slate-300" />
-            <p>No upcoming events are scheduled in your division right now.</p>
+            <p>{t("noUpcomingEvents")}</p>
           </div>
         )}
       </div>

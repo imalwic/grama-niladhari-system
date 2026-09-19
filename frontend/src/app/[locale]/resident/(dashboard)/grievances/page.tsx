@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useTranslations } from "next-intl";
 import { Plus, ArrowLeft, CheckCircle2, Search, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -25,6 +26,7 @@ type GrievanceType = {
 };
 
 export default function ResidentGrievancesPage() {
+  const t = useTranslations("Resident");
   const [data, setData] = useState<GrievanceType[]>([]);
   const [isFormView, setIsFormView] = useState(false);
   const [search, setSearch] = useState("");
@@ -110,13 +112,13 @@ export default function ResidentGrievancesPage() {
             <div className="flex justify-center mb-4">
               <CheckCircle2 className="h-16 w-16 text-green-600" />
             </div>
-            <CardTitle className="text-2xl">Grievance Submitted</CardTitle>
+            <CardTitle className="text-2xl">{t("grievanceSubmittedTitle")}</CardTitle>
             <CardDescription>
-              Your complaint has been recorded successfully.
+              {t("complaintRecorded")}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-sm text-slate-600 dark:text-slate-300">
-            Thank you for bringing this to our attention. The assigned officer will review the matter shortly.
+            {t("thankYouGrievance")}
           </CardContent>
           <CardFooter>
             <Button 
@@ -129,7 +131,7 @@ export default function ResidentGrievancesPage() {
                 setDescription("");
               }}
             >
-              Return to Inbox
+              {t("returnToInbox")}
             </Button>
           </CardFooter>
         </Card>
@@ -141,58 +143,58 @@ export default function ResidentGrievancesPage() {
     return (
       <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full">
         <Button variant="ghost" onClick={() => setIsFormView(false)} className="w-fit">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Inbox
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t("backToInbox")}
         </Button>
         <Card className="border-t-4 border-t-red-700 shadow-lg dark:bg-slate-900 dark:border-slate-800 dark:border-t-red-600">
           <form onSubmit={handleSubmit}>
             <CardHeader>
-              <CardTitle>Submit a Grievance</CardTitle>
+              <CardTitle>{t("submitGrievanceTitle")}</CardTitle>
               <CardDescription>
-                Report an issue to your Grama Niladhari or escalate it to the Global Admin.
+                {t("reportIssueDesc")}
               </CardDescription>
               {errorMsg && <div className="text-red-500 text-sm font-semibold mt-2">{errorMsg}</div>}
             </CardHeader>
             <CardContent className="space-y-6">
               
               <div className="space-y-4">
-                <h3 className="text-sm font-medium leading-none border-b pb-2 dark:border-slate-800">Who should review this?</h3>
+                <h3 className="text-sm font-medium leading-none border-b pb-2 dark:border-slate-800">{t("whoShouldReview")}</h3>
                 <div className="space-y-2">
-                  <Label htmlFor="assignedTo">Assign To</Label>
+                  <Label htmlFor="assignedTo">{t("assignToLabel")}</Label>
                   <Select value={assignedTo} onValueChange={(val) => setAssignedTo(val || "")}>
                     <SelectTrigger id="assignedTo" className="dark:bg-slate-800 dark:border-slate-700">
-                      <SelectValue placeholder="Select Authority" />
+                      <SelectValue placeholder={t("selectAuthority")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="GN_OFFICER">Grama Niladhari (Local)</SelectItem>
-                      <SelectItem value="GLOBAL_ADMIN">Global Admin (Central)</SelectItem>
+                      <SelectItem value="GN_OFFICER">{t("gnLocal")}</SelectItem>
+                      <SelectItem value="GLOBAL_ADMIN">{t("globalCentral")}</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground mt-1">
                     {assignedTo === "GN_OFFICER" 
-                      ? "This will be sent directly to your Grama Niladhari for resolution." 
-                      : "This will be escalated to the central authorities. Your Grama Niladhari will not see this."}
+                      ? "{t("gnResolutionDesc")}" 
+                      : "{t("globalResolutionDesc")}"}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-sm font-medium leading-none border-b pb-2 dark:border-slate-800">Identity Verification</h3>
+                <h3 className="text-sm font-medium leading-none border-b pb-2 dark:border-slate-800">{t("identityVerification")}</h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="identityType">Identity Document Type</Label>
+                    <Label htmlFor="identityType">{t("idDocType")}</Label>
                     <Select value={identityType} onValueChange={(val) => setIdentityType(val || "")}>
                       <SelectTrigger id="identityType" className="dark:bg-slate-800 dark:border-slate-700">
-                        <SelectValue placeholder="Select ID type" />
+                        <SelectValue placeholder={t("selectIdType")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="NIC">National Identity Card (NIC)</SelectItem>
-                        <SelectItem value="PASSPORT">Passport</SelectItem>
-                        <SelectItem value="DRIVING_LICENSE">Driving License</SelectItem>
+                        <SelectItem value="NIC">{t("nicType")}</SelectItem>
+                        <SelectItem value="PASSPORT">{t("passportType")}</SelectItem>
+                        <SelectItem value="DRIVING_LICENSE">{t("drivingLicenseType")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="identityNumber">Document Number</Label>
+                    <Label htmlFor="identityNumber">{t("docNumber")}</Label>
                     <Input 
                       id="identityNumber" 
                       value={identityNumber}
@@ -202,7 +204,7 @@ export default function ResidentGrievancesPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="reportedBy">Your Full Name</Label>
+                    <Label htmlFor="reportedBy">{t("yourFullName")}</Label>
                     <Input 
                       id="reportedBy" 
                       value={reportedBy}
@@ -212,7 +214,7 @@ export default function ResidentGrievancesPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="contactInfo">Contact Phone / Email</Label>
+                    <Label htmlFor="contactInfo">{t("contactPhoneEmail")}</Label>
                     <Input 
                       id="contactInfo" 
                       value={contactInfo}
@@ -225,12 +227,12 @@ export default function ResidentGrievancesPage() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-sm font-medium leading-none border-b pb-2 dark:border-slate-800">Complaint Details</h3>
+                <h3 className="text-sm font-medium leading-none border-b pb-2 dark:border-slate-800">{t("complaintDetails")}</h3>
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Subject</Label>
+                  <Label htmlFor="subject">{t("subjectLabel")}</Label>
                   <Input 
                     id="subject" 
-                    placeholder="Brief summary of the issue" 
+                    placeholder={t("subjectPlaceholder")} 
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     required 
@@ -238,10 +240,10 @@ export default function ResidentGrievancesPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Detailed Description</Label>
+                  <Label htmlFor="description">{t("detailedDescLabel")}</Label>
                   <Textarea 
                     id="description" 
-                    placeholder="Please explain what happened in detail..." 
+                    placeholder={t("detailedDescPlaceholder")} 
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required 
@@ -253,7 +255,7 @@ export default function ResidentGrievancesPage() {
             </CardContent>
             <CardFooter>
               <Button type="submit" className="w-full bg-red-700 hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white" disabled={isLoading}>
-                {isLoading ? "Submitting..." : "Submit Grievance Securely"}
+                {isLoading ? t("submittingBtn") : t("submitGrievanceSecurelyBtn")}
               </Button>
             </CardFooter>
           </form>
@@ -266,22 +268,22 @@ export default function ResidentGrievancesPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">My Grievances</h1>
-          <p className="text-muted-foreground">Track your reported issues and complaints</p>
+          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("myGrievancesTitle")}</h1>
+          <p className="text-muted-foreground">{t("trackIssuesDesc")}</p>
         </div>
         <Button onClick={() => setIsFormView(true)} className="bg-[#003366] hover:bg-[#002244] text-white">
-          <Plus className="mr-2 h-4 w-4" /> New Grievance
+          <Plus className="mr-2 h-4 w-4" /> {t("newGrievanceBtn")}
         </Button>
       </div>
 
       <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
         <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <CardTitle>History</CardTitle>
-            <div className="relative w-64">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle>{t("historyTitle")}</CardTitle>
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search subject..."
+                placeholder={t("searchSubjectPlaceholder")}
                 className="pl-8"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -294,11 +296,11 @@ export default function ResidentGrievancesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
+                  <TableHead>{t("dateCol")}</TableHead>
                   <TableHead>Subject</TableHead>
-                  <TableHead>Assigned To</TableHead>
+                  <TableHead>{t("assignedToCol")}</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t("actionsCol")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -330,7 +332,7 @@ export default function ResidentGrievancesPage() {
                 {filteredData.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                      No grievances found.
+                      {t("noGrievancesFound")}
                     </TableCell>
                   </TableRow>
                 )}
@@ -344,9 +346,9 @@ export default function ResidentGrievancesPage() {
         {selectedGrievance && (
           <DialogContent className="sm:max-w-[500px] dark:bg-slate-900 dark:border-slate-800">
             <DialogHeader>
-              <DialogTitle className="text-xl">Grievance Details</DialogTitle>
+              <DialogTitle className="text-xl">{t("grievanceDetailsTitle")}</DialogTitle>
               <DialogDescription>
-                Submitted on {new Date(selectedGrievance.createdAt).toLocaleString()}
+                {t("submittedOn")} {new Date(selectedGrievance.createdAt).toLocaleString()}
               </DialogDescription>
             </DialogHeader>
             
@@ -366,7 +368,7 @@ export default function ResidentGrievancesPage() {
               </div>
               
               <div className="text-sm text-muted-foreground mt-4">
-                Assigned Authority: <strong>{selectedGrievance.assignedTo === 'GN_OFFICER' ? 'Grama Niladhari' : 'Global Admin'}</strong>
+                {t("assignedAuthorityLabel")} <strong>{selectedGrievance.assignedTo === 'GN_OFFICER' ? 'Grama Niladhari' : 'Global Admin'}</strong>
               </div>
             </div>
           </DialogContent>

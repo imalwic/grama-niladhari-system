@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 import { Gift, FileText } from "lucide-react";
 
 function getAuthHeaders() {
@@ -15,6 +16,7 @@ function getAuthHeaders() {
 }
 
 export default function ResidentSubsidies() {
+  const t = useTranslations("Resident");
   const [programs, setPrograms] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,9 +66,9 @@ export default function ResidentSubsidies() {
     <div className="flex flex-col gap-8 max-w-5xl mx-auto w-full">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400 flex items-center gap-2 mb-2">
-          <Gift className="h-8 w-8" /> Subsidy Programs
+          <Gift className="h-8 w-8" /> {t("subsidyProgramsTitle")}
         </h1>
-        <p className="text-muted-foreground">Apply for government relief and financial assistance programs.</p>
+        <p className="text-muted-foreground">{t("applyGovReliefDesc")}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -89,29 +91,29 @@ export default function ResidentSubsidies() {
                 className={`w-full ${applied ? 'bg-slate-100 text-slate-500' : 'bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700 text-white'}`}
                 variant={applied ? "outline" : "default"}
               >
-                {applied ? "Already Applied" : "Apply Now"}
+                {applied ? t("alreadyAppliedBtn") : t("applyNowBtn")}
               </Button>
             </div>
           );
         })}
         {!loading && programs.length === 0 && (
           <div className="col-span-full p-8 text-center border border-dashed rounded-lg text-muted-foreground bg-slate-50 dark:bg-slate-900">
-            No active subsidy programs are currently available in your division.
+            {t("noActiveSubsidies")}
           </div>
         )}
       </div>
 
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-           <FileText className="h-6 w-6 text-slate-500" /> My Applications
+           <FileText className="h-6 w-6 text-slate-500" /> {t("myApplicationsTitle")}
         </h2>
         <div className="rounded-md border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm overflow-hidden">
           <Table>
             <TableHeader className="bg-slate-50 dark:bg-slate-800">
               <TableRow>
-                <TableHead>Program Name</TableHead>
-                <TableHead>Applied Date</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t("programNameCol")}</TableHead>
+                <TableHead>{t("appliedDateCol")}</TableHead>
+                <TableHead>{t("statusCol")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -132,7 +134,7 @@ export default function ResidentSubsidies() {
               {applications.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                    You haven't applied to any subsidy programs yet.
+                    {t("noAppsYet")}
                   </TableCell>
                 </TableRow>
               )}
