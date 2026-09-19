@@ -20,6 +20,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { SubsidiesModule } from './subsidies/subsidies.module';
 import { EventsModule } from './events/events.module';
 import { ReportsModule } from './reports/reports.module';
+import { PdfFormsModule } from './pdf-forms/pdf-forms.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ReportsModule } from './reports/reports.module';
     SubsidiesModule,
     EventsModule,
     ReportsModule,
+    PdfFormsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
