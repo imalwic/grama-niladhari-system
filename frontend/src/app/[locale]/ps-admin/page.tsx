@@ -66,7 +66,7 @@ export default function SuperAdminDashboard() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("title")}</h1>
         <p className="text-muted-foreground">
-          Overview of all Grama Niladhari divisions under {psName} Pradeshiya Sabha.
+          {t("overviewPsAdminDesc", { psName })}
         </p>
       </div>
 
@@ -121,10 +121,10 @@ export default function SuperAdminDashboard() {
               {t("populationDistribution")}
             </CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] flex flex-col md:flex-row items-center justify-around border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4 gap-4">
+          <CardContent className="min-h-[300px] md:h-[350px] flex flex-col md:flex-row items-center justify-around border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-6 gap-8">
             {stats.ageDemographics && stats.ageDemographics.length > 0 ? (
-              <div className="w-full md:w-1/2 h-full">
-                <p className="text-sm text-center font-medium mb-2">Age Distribution</p>
+              <div className="w-full md:w-1/2 h-[250px] md:h-full">
+                <p className="text-sm text-center font-medium mb-2">{t("ageDistributionTitle")}</p>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -146,12 +146,12 @@ export default function SuperAdminDashboard() {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <p className="text-muted-foreground italic">No age demographic data available.</p>
+              <p className="text-muted-foreground italic">{t("noAgeDemographics")}</p>
             )}
 
             {stats.relationships && stats.relationships.length > 0 && (
-              <div className="w-full md:w-1/2 h-full">
-                <p className="text-sm text-center font-medium mb-2">Household Relationships</p>
+              <div className="w-full md:w-1/2 h-[250px] md:h-full">
+                <p className="text-sm text-center font-medium mb-2">{t("householdRelationshipsTitle")}</p>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -197,7 +197,7 @@ export default function SuperAdminDashboard() {
                 </div>
               ))}
               {stats.recentActivity.length === 0 && (
-                <p className="text-sm text-muted-foreground">No recent activity found.</p>
+                <p className="text-sm text-muted-foreground">{t("noRecentActivity")}</p>
               )}
             </div>
           </CardContent>

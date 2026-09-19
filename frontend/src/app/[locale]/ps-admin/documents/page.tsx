@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useTranslations } from "next-intl";
 import { Search, FileText, Download } from "lucide-react";
 
 type SharedDocument = {
@@ -15,6 +16,7 @@ type SharedDocument = {
 };
 
 export default function PSAdminDocumentsPage() {
+  const t = useTranslations("SuperAdmin");
   const [data, setData] = useState<SharedDocument[]>([]);
   const [search, setSearch] = useState("");
 
@@ -42,19 +44,19 @@ export default function PSAdminDocumentsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">Received Documents</h1>
-          <p className="text-muted-foreground">Files and forms shared by the Global Admin</p>
+          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("receivedDocsTitle")}</h1>
+          <p className="text-muted-foreground">{t("receivedDocsDesc")}</p>
         </div>
       </div>
 
       <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
         <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <CardTitle>Inbox</CardTitle>
-            <div className="relative w-64">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle>{t("inboxTitle")}</CardTitle>
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search documents..."
+                placeholder={t("searchDocsPlaceholder")}
                 className="pl-8"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -67,9 +69,9 @@ export default function PSAdminDocumentsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date Received</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
+                  <TableHead>{t("dateReceivedCol")}</TableHead>
+                  <TableHead>{t("titleCol")}</TableHead>
+                  <TableHead className="text-right">{t("actionCol")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -86,7 +88,7 @@ export default function PSAdminDocumentsPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" onClick={() => window.open(doc.fileUrl, '_blank')}>
-                        <Download className="mr-2 h-4 w-4" /> View / Download
+                        <Download className="mr-2 h-4 w-4" /> {t("viewDownloadBtn")}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -95,7 +97,7 @@ export default function PSAdminDocumentsPage() {
                   <TableRow>
                     <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
                       <FileText className="h-12 w-12 mx-auto text-slate-300 mb-3" />
-                      No documents have been shared with your Pradeshiya Sabha yet.
+                      {t("noPsDocsFound")}
                     </TableCell>
                   </TableRow>
                 )}
