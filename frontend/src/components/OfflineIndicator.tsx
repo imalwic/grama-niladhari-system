@@ -9,7 +9,9 @@ export function OfflineIndicator() {
   useEffect(() => {
     // Check initial state
     if (typeof navigator !== "undefined") {
-      setIsOffline(!navigator.onLine);
+      setTimeout(() => {
+        setIsOffline(!navigator.onLine);
+      }, 0);
     }
 
     const handleOnline = () => setIsOffline(false);

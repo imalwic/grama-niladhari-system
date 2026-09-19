@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,10 +67,13 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        setCurrentUser({
-          name: payload.name || user.name,
-          email: payload.email || user.email,
-        });
+        // Delaying setState to avoid synchronous setState during effect setup warning
+        setTimeout(() => {
+          setCurrentUser({
+            name: payload.name || user.name,
+            email: payload.email || user.email,
+          });
+        }, 0);
       } catch (e) {}
     }
     const storedDark = localStorage.getItem("dark-mode") === "true";
@@ -80,7 +84,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     
     if (storedDark) document.documentElement.classList.add("dark");
     if (storedText) document.documentElement.classList.add("large-text");
-  }, []);
+  }, [user.name, user.email]);
 
   const toggleDarkMode = () => {
     const newValue = !darkMode;
@@ -102,34 +106,35 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/";
+    router.replace("/");
   };
 
   const systemAdminNav: SidebarItem[] = [
     { name: nav("overview"), href: "/system-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("pradeshiyaSabhas"), href: "/system-admin/pradeshiya-sabhas", icon: <LayoutDashboard className="h-5 w-5" /> },
-    { name: "Grievances", href: "/system-admin/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
-    { name: "Shared Docs", href: "/system-admin/documents", icon: <FileText className="h-5 w-5" /> },
+    { name: nav("grievances"), href: "/system-admin/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
+    { name: nav("sharedDocs"), href: "/system-admin/documents", icon: <FileText className="h-5 w-5" /> },
   ];
 
   const psAdminNav: SidebarItem[] = [
     { name: nav("overview"), href: "/ps-admin", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("gnOfficers"), href: "/ps-admin/gn-officers", icon: <Users className="h-5 w-5" /> },
-    { name: "Shared Docs", href: "/ps-admin/documents", icon: <FileText className="h-5 w-5" /> },
-    { name: "Reports", href: "/ps-admin/reports", icon: <FileText className="h-5 w-5" /> },
+    { name: nav("sharedDocs"), href: "/ps-admin/documents", icon: <FileText className="h-5 w-5" /> },
+    { name: nav("reports"), href: "/ps-admin/reports", icon: <FileText className="h-5 w-5" /> },
   ];
 
   const gnOfficerNav: SidebarItem[] = [
     { name: nav("dashboard"), href: "/gn-officer", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("households"), href: "/gn-officer/households", icon: <Home className="h-5 w-5" /> },
     { name: nav("residents"), href: "/gn-officer/residents", icon: <Users className="h-5 w-5" /> },
-    { name: "Voters Registry", href: "/gn-officer/voters", icon: <Users className="h-5 w-5" /> },
+    { name: nav("voters"), href: "/gn-officer/voters", icon: <Users className="h-5 w-5" /> },
     { name: nav("requests"), href: "/gn-officer/requests", icon: <FileText className="h-5 w-5" /> },
-    { name: "Subsidies", href: "/gn-officer/subsidies", icon: <Gift className="h-5 w-5" /> },
-    { name: "Events", href: "/gn-officer/events", icon: <Calendar className="h-5 w-5" /> },
+    { name: nav("subsidies"), href: "/gn-officer/subsidies", icon: <Gift className="h-5 w-5" /> },
+    { name: nav("events"), href: "/gn-officer/events", icon: <Calendar className="h-5 w-5" /> },
     { name: nav("notices"), href: "/gn-officer/notices", icon: <Bell className="h-5 w-5" /> },
-    { name: "PS Reports", href: "/gn-officer/reports", icon: <FileText className="h-5 w-5" /> },
-    { name: "Grievances", href: "/gn-officer/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
+    { name: nav("psReports"), href: "/gn-officer/reports", icon: <FileText className="h-5 w-5" /> },
+    { name: nav("grievances"), href: "/gn-officer/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
+    { name: "PDF Forms", href: "/gn-officer/forms", icon: <FileText className="h-5 w-5" /> },
     { name: nav("settings"), href: "/gn-officer/settings", icon: <Settings className="h-5 w-5" /> },
   ];
 
@@ -137,10 +142,11 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
     { name: nav("dashboard"), href: "/resident", icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: nav("myHousehold"), href: "/resident/household", icon: <Home className="h-5 w-5" /> },
     { name: nav("certificates"), href: "/resident/requests", icon: <FileText className="h-5 w-5" /> },
-    { name: "Subsidies", href: "/resident/subsidies", icon: <Gift className="h-5 w-5" /> },
-    { name: "Events", href: "/resident/events", icon: <Calendar className="h-5 w-5" /> },
+    { name: nav("subsidies"), href: "/resident/subsidies", icon: <Gift className="h-5 w-5" /> },
+    { name: nav("events"), href: "/resident/events", icon: <Calendar className="h-5 w-5" /> },
     { name: nav("notices"), href: "/resident/notices", icon: <Bell className="h-5 w-5" /> },
-    { name: "Grievances", href: "/resident/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
+    { name: nav("grievances"), href: "/resident/grievances", icon: <AlertTriangle className="h-5 w-5" /> },
+    { name: "Fill Forms", href: "/resident/forms", icon: <FileText className="h-5 w-5" /> },
   ];
 
   const navigation = role === "SUPER_ADMIN" ? systemAdminNav : role === "PS_ADMIN" ? psAdminNav : role === "GN_OFFICER" ? gnOfficerNav : residentNav;
@@ -194,10 +200,46 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
       </aside>
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-64">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white dark:bg-slate-900 dark:border-slate-800 px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 shadow-sm sm:shadow-none transition-colors">
-          <Button size="icon" variant="outline" className="sm:hidden dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700">
-            <Menu className="h-5 w-5 dark:text-slate-200" />
-            <span className="sr-only">{common("toggleMenu")}</span>
-          </Button>
+          <Sheet>
+            <SheetTrigger render={<Button size="icon" variant="outline" className="sm:hidden dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700" />}>
+              <Menu className="h-5 w-5 dark:text-slate-200" />
+              <span className="sr-only">{common("toggleMenu")}</span>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72 sm:max-w-xs dark:bg-slate-900 dark:border-slate-800 flex flex-col pt-10">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              <SheetDescription className="sr-only">Access dashboard pages</SheetDescription>
+              <div className="flex items-center gap-3 font-semibold pb-4 border-b dark:border-slate-800">
+                <Image src="/emblem.svg" alt="Sri Lanka Emblem" width={32} height={32} className="object-contain" />
+                <span className="text-sm leading-tight text-[#003366] dark:text-blue-400 font-bold">
+                  {common("gramaNiladhariSystem").split(" ").slice(0, 2).join(" ")}<br/>{common("gramaNiladhariSystem").split(" ").slice(2).join(" ") || "System"}
+                </span>
+              </div>
+              <div className="flex-1 overflow-auto py-2">
+                <nav className="grid gap-1 text-sm font-medium">
+                  {navigation.map((item) => {
+                    const rootPath = role === "SUPER_ADMIN" ? "/system-admin" : role === "PS_ADMIN" ? "/ps-admin" : role === "GN_OFFICER" ? "/gn-officer" : "/resident";
+                    const isActive = item.href === rootPath 
+                      ? pathname === item.href 
+                      : (pathname === item.href || pathname?.startsWith(item.href + "/"));
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center gap-3 rounded-md px-3 py-2.5 transition-all ${
+                          isActive
+                            ? "bg-[#003366] dark:bg-blue-600 text-white shadow-sm"
+                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                        }`}
+                      >
+                        {item.icon}
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+            </SheetContent>
+          </Sheet>
           <div className="flex flex-1 items-center justify-end gap-4">
              <div className="hidden sm:block text-right">
                 <p className="text-sm font-medium leading-none text-[#003366] dark:text-blue-400">{currentUser.name}</p>
@@ -274,7 +316,7 @@ export function DashboardLayout({ children, role, user }: DashboardLayoutProps) 
             </DropdownMenu>
           </div>
         </header>
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+        <main className="flex flex-col flex-1 gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 w-full max-w-full overflow-x-hidden">
           {children}
         </main>
       </div>
