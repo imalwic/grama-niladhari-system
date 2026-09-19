@@ -68,6 +68,7 @@ model Wasama {
   subsidyPrograms SubsidyProgram[]
   events     CommunityEvent[]
   reportRequests ReportRequest[]
+  formCategories FormCategory[]
 }
 
 model User {
@@ -95,6 +96,7 @@ model User {
   auditLogs      AuditLog[]
   requestedReports ReportRequest[] @relation("PSAdminRequests")
   reviewedReports  ReportRequest[] @relation("GNReportReviews")
+  uploadedForms    DynamicForm[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -148,6 +150,7 @@ model Resident {
   requests     Request[]
   grievances   Grievance[]
   rsvps        EventRSVP[]
+  formSubmissions FormSubmission[]
 }
 
 model Category {
@@ -349,3 +352,59 @@ model ReportRequest {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
+
+// -----------------------------------------------------------------------------
+// DYNAMIC PDF FORMS
+// -----------------------------------------------------------------------------
+
+model FormCategory {
+  id        String   @id @default(uuid())
+  name      String
+  wasamaId  String
+  wasama    Wasama   @relation(fields: [wasamaId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  forms DynamicForm[]
+}
+
+model DynamicForm {
+  id           String       @id @default(uuid())
+  title        String
+  categoryId   String
+  category     FormCategory @relation(fields: [categoryId], references: [id])
+  pdfUrl       String
+  status       String       @default("DRAFT") // DRAFT, PUBLISHED
+  uploadedById String
+  uploadedBy   User         @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  fields      FormField[]
+  submissions FormSubmission[]
+}
+
+model FormField {
+  id        String      @id @default(uuid())
+  formId    String
+  form      DynamicForm @relation(fields: [formId], references: [id])
+  label     String
+  type      String      @default("TEXT") // TEXT, CHECKBOX
+  x         Float
+  y         Float
+  width     Float
+  height    Float
+  page      Int         @default(1)
+}
+
+model FormSubmission {
+  id             String      @id @default(uuid())
+  formId         String
+  form           DynamicForm @relation(fields: [formId], references: [id])
+  residentId     String
+  resident       Resident    @relation(fields: [residentId], references: [id])
+  submissionData String?     // JSON
+  filledPdfUrl   String?
+  createdAt      DateTime    @default(now())
+}
+
