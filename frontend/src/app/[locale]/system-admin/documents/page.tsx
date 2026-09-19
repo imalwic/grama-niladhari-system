@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, ArrowLeft, Search, FileText } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type SharedDocument = {
@@ -28,6 +29,7 @@ type PradeshiyaSabha = {
 };
 
 export default function GlobalAdminDocumentsPage() {
+  const t = useTranslations("SuperAdmin");
   const [data, setData] = useState<SharedDocument[]>([]);
   const [psList, setPsList] = useState<PradeshiyaSabha[]>([]);
   const [isFormView, setIsFormView] = useState(false);
@@ -135,21 +137,21 @@ export default function GlobalAdminDocumentsPage() {
     return (
       <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full">
         <Button variant="ghost" onClick={() => setIsFormView(false)} className="w-fit">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Shared Documents
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t("backToSharedDocs")}
         </Button>
         <Card className="shadow-lg dark:bg-slate-900 dark:border-slate-800">
           <form onSubmit={handleSubmit}>
             <CardHeader>
-              <CardTitle>Share New Document</CardTitle>
+              <CardTitle>{t("shareNewDocTitle")}</CardTitle>
               <CardDescription>
-                Upload a document (via link) and select which Pradeshiya Sabhas should receive it.
+                {t("uploadDocDesc")}
               </CardDescription>
               {errorMsg && <div className="text-red-500 text-sm font-semibold mt-2">{errorMsg}</div>}
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Document Title</Label>
+                  <Label htmlFor="title">{t("docTitleLabel")}</Label>
                   <Input 
                     id="title" 
                     placeholder="e.g., Updated Circular 2026" 
@@ -160,10 +162,10 @@ export default function GlobalAdminDocumentsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Document File</Label>
+                  <Label>{t("docFileLabel")}</Label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="fileUpload" className="text-xs text-muted-foreground">Upload from computer</Label>
+                      <Label htmlFor="fileUpload" className="text-xs text-muted-foreground">{t("uploadComputerLabel")}</Label>
                       <Input 
                         id="fileUpload" 
                         type="file"
@@ -176,7 +178,7 @@ export default function GlobalAdminDocumentsPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="fileUrl" className="text-xs text-muted-foreground">OR enter an external URL</Label>
+                      <Label htmlFor="fileUrl" className="text-xs text-muted-foreground">{t("externalUrlLabel")}</Label>
                       <Input 
                         id="fileUrl" 
                         type="url"
@@ -191,20 +193,20 @@ export default function GlobalAdminDocumentsPage() {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Provide either an uploaded PDF file OR a direct link (e.g. Google Drive link).
+                    {t("docProvideDesc")}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4 pt-4 border-t dark:border-slate-800">
-                <h3 className="text-sm font-semibold">Select Target Pradeshiya Sabhas</h3>
+                <h3 className="text-sm font-semibold">{t("selectTargetPs")}</h3>
                 <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-2 rounded">
-                  <span className="text-sm text-muted-foreground">{selectedPsIds.length} selected</span>
+                  <span className="text-sm text-muted-foreground">{selectedPsIds.length} {t("selectedLabel")}</span>
                   <Button type="button" variant="outline" size="sm" onClick={() => {
                     if (selectedPsIds.length === psList.length) setSelectedPsIds([]);
                     else setSelectedPsIds(psList.map(ps => ps.id));
                   }}>
-                    {selectedPsIds.length === psList.length ? "Deselect All" : "Select All"}
+                    {selectedPsIds.length === psList.length ? t("deselectAllBtn") : t("selectAllBtn")}
                   </Button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto p-1">
@@ -224,7 +226,7 @@ export default function GlobalAdminDocumentsPage() {
             </CardContent>
             <CardFooter>
               <Button type="submit" className="w-full bg-[#003366] hover:bg-[#002244] dark:bg-blue-600 dark:hover:bg-blue-700 text-white" disabled={isLoading}>
-                {isLoading ? "Sharing..." : "Share Document"}
+                {isLoading ? t("sharingBtnText") : t("shareDocBtnText")}
               </Button>
             </CardFooter>
           </form>
@@ -237,22 +239,22 @@ export default function GlobalAdminDocumentsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">Shared Documents</h1>
-          <p className="text-muted-foreground">Manage and distribute forms to Pradeshiya Sabhas</p>
+          <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("sharedDocsTitle")}</h1>
+          <p className="text-muted-foreground">{t("manageDocsDesc")}</p>
         </div>
         <Button onClick={() => setIsFormView(true)} className="bg-[#003366] hover:bg-[#002244] text-white">
-          <Plus className="mr-2 h-4 w-4" /> Share New Document
+          <Plus className="mr-2 h-4 w-4" /> {t("shareNewDocTitle")}
         </Button>
       </div>
 
       <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
         <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <CardTitle>Distributed Files</CardTitle>
-            <div className="relative w-64">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle>{t("distributedFilesTitle")}</CardTitle>
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search documents..."
+                placeholder="{t("searchDocsPlaceholder")}"
                 className="pl-8"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -265,10 +267,10 @@ export default function GlobalAdminDocumentsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date Shared</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Recipients</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t("dateSharedCol")}</TableHead>
+                  <TableHead>{t("titleCol")}</TableHead>
+                  <TableHead>{t("recipientsCol")}</TableHead>
+                  <TableHead>{t("actionsCol")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -303,7 +305,7 @@ export default function GlobalAdminDocumentsPage() {
                 {filteredData.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
-                      No shared documents found.
+                      {t("noSharedDocsFound")}
                     </TableCell>
                   </TableRow>
                 )}
@@ -317,9 +319,9 @@ export default function GlobalAdminDocumentsPage() {
         {selectedDoc && (
           <DialogContent className="sm:max-w-[500px] dark:bg-slate-900 dark:border-slate-800">
             <DialogHeader>
-              <DialogTitle className="text-xl">Document Details</DialogTitle>
+              <DialogTitle className="text-xl">{t("docDetailsTitle")}</DialogTitle>
               <DialogDescription>
-                Shared on {new Date(selectedDoc.createdAt).toLocaleString()}
+                {t("sharedOn")} {new Date(selectedDoc.createdAt).toLocaleString()}
               </DialogDescription>
             </DialogHeader>
             
@@ -332,7 +334,7 @@ export default function GlobalAdminDocumentsPage() {
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2">Targeted Pradeshiya Sabhas</h4>
+                <h4 className="font-semibold mb-2">{t("targetedPsLabel")}</h4>
                 <div className="text-sm p-3 border rounded-md max-h-48 overflow-y-auto dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
                   <ul className="list-disc pl-5 space-y-1">
                     {selectedDoc.pradeshiyaSabhas.map(ps => (

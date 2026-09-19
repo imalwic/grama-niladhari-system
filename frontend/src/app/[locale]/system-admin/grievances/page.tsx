@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useTranslations } from "next-intl";
 import { Search, Eye, AlertCircle, CheckCircle2 } from "lucide-react";
 
 type GrievanceType = {
@@ -23,6 +24,7 @@ type GrievanceType = {
 };
 
 export default function GrievancesManagementPage() {
+  const t = useTranslations("SuperAdmin");
   const [data, setData] = useState<GrievanceType[]>([]);
   const [search, setSearch] = useState("");
   const [selectedGrievance, setSelectedGrievance] = useState<GrievanceType | null>(null);
@@ -75,19 +77,19 @@ export default function GrievancesManagementPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-red-700 dark:text-red-500">Public Grievances</h1>
-          <p className="text-muted-foreground">Monitor and resolve citizen complaints</p>
+          <h1 className="text-3xl font-bold tracking-tight text-red-700 dark:text-red-500">{t("publicGrievancesTitle")}</h1>
+          <p className="text-muted-foreground">{t("monitorGrievancesDesc")}</p>
         </div>
       </div>
 
       <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800">
         <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <CardTitle>Grievance Inbox</CardTitle>
-            <div className="relative w-64">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle>{t("grievanceInboxTitle")}</CardTitle>
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search subject or ID..."
+                placeholder="{t("searchGrievancePlaceholder")}"
                 className="pl-8"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -100,11 +102,11 @@ export default function GrievancesManagementPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Citizen</TableHead>
-                  <TableHead>Subject</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t("dateCol")}</TableHead>
+                  <TableHead>{t("citizenCol")}</TableHead>
+                  <TableHead>{t("subjectCol")}</TableHead>
+                  <TableHead>{t("statusCol")}</TableHead>
+                  <TableHead>{t("actionsCol")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -129,7 +131,7 @@ export default function GrievancesManagementPage() {
                     </TableCell>
                     <TableCell>
                       <Button variant="outline" size="sm" onClick={() => setSelectedGrievance(g)}>
-                        <Eye className="mr-2 h-4 w-4" /> View
+                        <Eye className="mr-2 h-4 w-4" /> {t("viewBtn")}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -137,7 +139,7 @@ export default function GrievancesManagementPage() {
                 {filteredData.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                      No grievances found.
+                      {t("noGrievancesFound")}
                     </TableCell>
                   </TableRow>
                 )}
@@ -151,44 +153,44 @@ export default function GrievancesManagementPage() {
         {selectedGrievance && (
           <DialogContent className="sm:max-w-[600px] dark:bg-slate-900 dark:border-slate-800">
             <DialogHeader>
-              <DialogTitle className="text-xl">Review Grievance</DialogTitle>
+              <DialogTitle className="text-xl">{t("reviewGrievanceTitle")}</DialogTitle>
               <DialogDescription>
-                Submitted on {new Date(selectedGrievance.createdAt).toLocaleString()}
+                {t("submittedOn")} {new Date(selectedGrievance.createdAt).toLocaleString()}
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4 text-sm bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
                 <div>
-                  <span className="text-muted-foreground block mb-1">Reported By</span>
+                  <span className="text-muted-foreground block mb-1">{t("reportedByLabel")}</span>
                   <span className="font-medium">{selectedGrievance.reportedBy}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground block mb-1">Identity Document</span>
+                  <span className="text-muted-foreground block mb-1">{t("identityDocLabel")}</span>
                   <span className="font-medium">{selectedGrievance.identityType}: {selectedGrievance.identityNumber}</span>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-muted-foreground block mb-1">Contact Info</span>
+                  <span className="text-muted-foreground block mb-1">{t("contactInfoLabel")}</span>
                   <span className="font-medium">{selectedGrievance.contactInfo || "N/A"}</span>
                 </div>
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2">Subject</h4>
+                <h4 className="font-semibold mb-2">{t("subjectCol")}</h4>
                 <p className="text-sm font-medium p-3 bg-red-50 text-red-900 dark:bg-red-900/20 dark:text-red-400 rounded-md">
                   {selectedGrievance.subject}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2">Detailed Description</h4>
+                <h4 className="font-semibold mb-2">{t("detailedDescLabel")}</h4>
                 <div className="text-sm p-4 border rounded-md min-h-[100px] whitespace-pre-wrap dark:border-slate-700">
                   {selectedGrievance.description}
                 </div>
               </div>
 
               <div className="flex items-center justify-between border-t pt-4 dark:border-slate-800">
-                <span className="text-sm font-medium">Update Status:</span>
+                <span className="text-sm font-medium">{t("updateStatusLabel")}</span>
                 <div className="flex gap-2">
                   <Button 
                     size="sm" 
@@ -196,7 +198,7 @@ export default function GrievancesManagementPage() {
                     className={selectedGrievance.status === 'INVESTIGATING' ? 'bg-amber-600 hover:bg-amber-700' : ''}
                     onClick={() => updateStatus(selectedGrievance.id, 'INVESTIGATING')}
                   >
-                    <AlertCircle className="mr-2 h-4 w-4" /> Investigating
+                    <AlertCircle className="mr-2 h-4 w-4" /> {t("investigatingBtn")}
                   </Button>
                   <Button 
                     size="sm" 
@@ -204,7 +206,7 @@ export default function GrievancesManagementPage() {
                     className={selectedGrievance.status === 'RESOLVED' ? 'bg-green-600 hover:bg-green-700' : ''}
                     onClick={() => updateStatus(selectedGrievance.id, 'RESOLVED')}
                   >
-                    <CheckCircle2 className="mr-2 h-4 w-4" /> Resolved
+                    <CheckCircle2 className="mr-2 h-4 w-4" /> {t("resolvedBtn")}
                   </Button>
                 </div>
               </div>

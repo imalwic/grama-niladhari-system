@@ -48,16 +48,16 @@ export default function SystemAdminDashboard() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">Global System Overview</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-[#003366] dark:text-blue-400">{t("globalSystemOverview")}</h1>
         <p className="text-muted-foreground">
-          Monitor all Pradeshiya Sabhas and system-wide statistics
+          {t("monitorSystem")}
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border-l-4 border-l-blue-600 shadow-sm dark:bg-slate-900 dark:border-slate-800 dark:border-l-blue-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Pradeshiya Sabhas</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("totalPradeshiyaSabhas")}</CardTitle>
             <Activity className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -66,7 +66,7 @@ export default function SystemAdminDashboard() {
         </Card>
         <Card className="border-l-4 border-l-green-600 shadow-sm dark:bg-slate-900 dark:border-slate-800 dark:border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total PS Admins</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("totalPsAdmins")}</CardTitle>
             <Users className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -75,7 +75,7 @@ export default function SystemAdminDashboard() {
         </Card>
         <Card className="border-l-4 border-l-orange-500 shadow-sm dark:bg-slate-900 dark:border-slate-800 dark:border-l-orange-400">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total GN Divisions</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("totalGnDivisions")}</CardTitle>
             <MapPin className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
@@ -84,7 +84,7 @@ export default function SystemAdminDashboard() {
         </Card>
         <Card className="border-l-4 border-l-purple-600 shadow-sm dark:bg-slate-900 dark:border-slate-800 dark:border-l-purple-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Residents</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("totalResidentsSystem")}</CardTitle>
             <Users className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
@@ -96,22 +96,22 @@ export default function SystemAdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-red-50/50 dark:bg-red-900/10">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Open Public Grievances</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("openPublicGrievances")}</CardTitle>
             <MessageSquare className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.pendingGrievances.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">Requires Admin Attention</p>
+            <p className="text-xs text-muted-foreground mt-1">{t("requiresAdminAttention")}</p>
           </CardContent>
         </Card>
         <Card className="shadow-sm dark:bg-slate-900 dark:border-slate-800 bg-amber-50/50 dark:bg-amber-900/10">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Fraud & Data Anomalies</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("fraudDataAnomalies")}</CardTitle>
             <AlertTriangle className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.anomalies ? stats.anomalies.length : 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">Flagged Households (&gt; 10 members)</p>
+            <p className="text-xs text-muted-foreground mt-1">{t("flaggedHouseholds")}</p>
           </CardContent>
         </Card>
       </div>
@@ -119,12 +119,12 @@ export default function SystemAdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">
         <Card className="col-span-4 shadow-sm dark:bg-slate-900 dark:border-slate-800">
           <CardHeader>
-            <CardTitle>System Demographics</CardTitle>
+            <CardTitle>{t("systemDemographics")}</CardTitle>
             <CardDescription>
-              Population distribution across Pradeshiya Sabhas
+              {t("populationDistributionPs")}
             </CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4">
+          <CardContent className="min-h-[300px] md:h-[350px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4">
             {stats.demographics && stats.demographics.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.demographics}>
@@ -138,15 +138,15 @@ export default function SystemAdminDashboard() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted-foreground italic">No demographics data available yet</p>
+              <p className="text-muted-foreground italic">{t("noDemographics")}</p>
             )}
           </CardContent>
         </Card>
         <Card className="col-span-3 shadow-sm dark:bg-slate-900 dark:border-slate-800 overflow-y-auto max-h-[400px]">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>{t("recentActivity")}</CardTitle>
             <CardDescription>
-              Latest Pradeshiya Sabhas added
+              {t("recentActivityPs")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -164,7 +164,7 @@ export default function SystemAdminDashboard() {
                 </div>
               ))}
               {(!stats.recentActivity || stats.recentActivity.length === 0) && (
-                <p className="text-sm text-muted-foreground">No recent activity found.</p>
+                <p className="text-sm text-muted-foreground">{t("noRecentActivity")}</p>
               )}
             </div>
           </CardContent>
@@ -175,10 +175,10 @@ export default function SystemAdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">
         <Card className="col-span-3 shadow-sm dark:bg-slate-900 dark:border-slate-800">
           <CardHeader>
-            <CardTitle>Category Insights</CardTitle>
-            <CardDescription>Resident distribution by category</CardDescription>
+            <CardTitle>{t("categoryInsights")}</CardTitle>
+            <CardDescription>{t("residentDist")}</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4">
+          <CardContent className="min-h-[300px] md:h-[350px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4">
             {stats.categoryStats && stats.categoryStats.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -203,17 +203,17 @@ export default function SystemAdminDashboard() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted-foreground italic">No category data available yet</p>
+              <p className="text-muted-foreground italic">{t("noCategoryData")}</p>
             )}
           </CardContent>
         </Card>
 
         <Card className="col-span-4 shadow-sm dark:bg-slate-900 dark:border-slate-800">
           <CardHeader>
-            <CardTitle>SLA & Bottleneck Tracking</CardTitle>
-            <CardDescription>Top 5 Pradeshiya Sabhas with most pending requests</CardDescription>
+            <CardTitle>{t("slaBottleneck")}</CardTitle>
+            <CardDescription>{t("top5Ps")}</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4">
+          <CardContent className="min-h-[300px] md:h-[350px] flex items-center justify-center border-t bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-700 p-4">
             {stats.bottlenecks && stats.bottlenecks.length > 0 && stats.bottlenecks.some((b: any) => b.pendingRequests > 0) ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.bottlenecks.filter((b: any) => b.pendingRequests > 0)} layout="vertical" margin={{ left: 20 }}>
@@ -223,11 +223,11 @@ export default function SystemAdminDashboard() {
                   <Tooltip 
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   />
-                  <Bar dataKey="pendingRequests" name="Pending Requests" fill="#ef4444" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="pendingRequests" name={t("pendingRequestsGraph")} fill="#ef4444" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted-foreground italic">No pending requests bottleneck detected</p>
+              <p className="text-muted-foreground italic">{t("noBottleneck")}</p>
             )}
           </CardContent>
         </Card>
@@ -239,9 +239,9 @@ export default function SystemAdminDashboard() {
           <CardHeader>
             <CardTitle className="text-amber-600 dark:text-amber-500 flex items-center gap-2">
               <AlertTriangle className="h-5 w-5" />
-              System Anomalies (Fraud Detection)
+              {t("systemAnomalies")}
             </CardTitle>
-            <CardDescription>Households flagged automatically for exceeding normal member limits (&gt;10)</CardDescription>
+            <CardDescription>{t("householdsFlagged")}</CardDescription>
           </CardHeader>
           <CardContent>
             {stats.anomalies && stats.anomalies.length > 0 ? (
@@ -249,10 +249,10 @@ export default function SystemAdminDashboard() {
                 <table className="w-full text-sm text-left">
                   <thead className="text-xs text-muted-foreground uppercase bg-slate-50 dark:bg-slate-800/50">
                     <tr>
-                      <th className="px-4 py-3">Household No</th>
-                      <th className="px-4 py-3">Grama Niladhari Division</th>
-                      <th className="px-4 py-3">Pradeshiya Sabha</th>
-                      <th className="px-4 py-3 text-right">Resident Count</th>
+                      <th className="px-4 py-3">{t("householdNoLabel")}</th>
+                      <th className="px-4 py-3">{t("gnDivisionLabel")}</th>
+                      <th className="px-4 py-3">{t("pradeshiyaSabhaLabel")}</th>
+                      <th className="px-4 py-3 text-right">{t("residentCount")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -269,7 +269,7 @@ export default function SystemAdminDashboard() {
               </div>
             ) : (
               <div className="flex items-center justify-center p-8 text-muted-foreground border border-dashed rounded-lg">
-                <p>No anomalies detected in the system. Data looks clean!</p>
+                <p>{t("noAnomalies")}</p>
               </div>
             )}
           </CardContent>
